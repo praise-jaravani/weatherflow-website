@@ -82,7 +82,7 @@ MARK = (
     'M10.4 14.2 6.8 16.6M6.9 7.3h9.3"/></svg>'
 )
 
-HEAD = """<!DOCTYPE html>
+HEAD = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -92,7 +92,7 @@ HEAD = """<!DOCTYPE html>
 <meta name="author" content="Génevieve Chikwanha, Zoleka Fuyana, Praise Jaravani">
 <link rel="stylesheet" href="assets/css/main.css">
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
-<script>document.documentElement.className+=" js";</script>
+<script>(function(d,w){{var r=d.documentElement;r.classList.add("js");w.wfUnarm=function(){{r.classList.remove("js");}};setTimeout(function(){{if(!w.wfReady)w.wfUnarm();}},2000);}})(document,window);</script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>

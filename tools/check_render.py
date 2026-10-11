@@ -100,6 +100,34 @@ def main():
         if not ok:
             bad += 1
 
+    # The failure that actually reached a user: the inline head script arms
+    # the reveal styles, then main.js never arrives, so the body stays hidden.
+    # Simulate it by moving the script aside and re-rendering the landing page.
+    js = os.path.join(ROOT, "assets", "js", "main.js")
+    stash = js + ".checkbak"
+    if os.path.exists(js):
+        shot = os.path.join(outdir, "nojs.render.png")
+        win_shot = ("C:\\" + shot[len("/mnt/c/"):].replace("/", "\\")
+                    if shot.startswith("/mnt/c/") else shot)
+        os.rename(js, stash)
+        try:
+            subprocess.run(
+                [browser, "--headless=new", "--disable-gpu", "--hide-scrollbars",
+                 "--virtual-time-budget=9000", "--window-size=1400,2600",
+                 f"--screenshot={win_shot}", page_url("index.html")],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=120)
+        finally:
+            os.rename(stash, js)
+        if os.path.exists(shot):
+            a = np.asarray(Image.open(shot).convert("RGB"))
+            rows = a.reshape(a.shape[0], -1).std(axis=1) > 2
+            frac = rows.sum() / len(rows)
+            ok = frac > 0.40
+            print(f"    {'index.html (no main.js)':<24} {'pass' if ok else 'FAIL'}   "
+                  f"{frac:.0%} content rows (watchdog must reveal the body)")
+            if not ok:
+                bad += 1
+
     print(f"  {len(pages)} pages rendered, {bad} with suspicious blank regions")
     return 1 if bad else 0
 

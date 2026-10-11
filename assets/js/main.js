@@ -4,6 +4,12 @@
 (function () {
   "use strict";
 
+  /* Tell the head watchdog we are alive. If this file fails to load, throws,
+     or simply never arrives, the watchdog strips the `js` class after 2s and
+     every reveal target falls back to plain visible content. Losing the
+     animation is acceptable; losing the page body is not. */
+  window.wfReady = true;
+
   var reduced = window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -133,7 +139,16 @@
     tiles.forEach(function (el) { io.observe(el); });
   }
 
-  function init() { reveal(); chrome(); counters(); }
+  function init() {
+    try {
+      reveal();
+      chrome();
+      counters();
+    } catch (e) {
+      if (window.wfUnarm) window.wfUnarm();   // never trap content behind a bug
+      throw e;
+    }
+  }
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
