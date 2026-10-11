@@ -26,6 +26,7 @@ link works; all motion is suppressed under `prefers-reduced-motion`.
 | HTML validation | 0 errors, 0 warnings — W3C Nu checker |
 | CSS validation | valid — W3C CSS validator |
 | Renders from `file://` | verified in headless Chrome |
+| Blank-region check | 7/7 pages pass |
 
 ## Layout
 
@@ -53,6 +54,7 @@ stays identical across every page.
 
     python3 tools/build.py          # regenerate the 7 pages
     python3 tools/check_links.py    # every relative link and anchor
+    python3 tools/check_render.py   # renders each page, fails on blank regions
     python3 tools/validate.py       # W3C HTML + CSS validators (needs network)
     python3 tools/make_network_svg.py # regenerate the hero constellation
     python3 tools/make_submission.py  # build the submission ZIP

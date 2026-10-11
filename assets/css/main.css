@@ -633,11 +633,15 @@ dl.kv dd { margin: 0; }
 
 /* Scroll reveal — armed only when JS is present, so content is never
    hidden if scripting is unavailable. */
-.js section:not(.hero):not(.page-head) > .wrap > :is(h2, h3, p, .eyebrow, .prose,
-  .grid, figure, .table-scroll, .note, .doclist, .people, .stat-row,
-  details.bib, dl.kv, .next-prev),
-.js section:not(.hero):not(.page-head) > .wrap > .prose-wide > :is(h2, h3, p,
-  .finding, .note, .next-prev) {
+/* The structural part sits in :where() so it contributes no specificity:
+   the whole rule weighs exactly one class (.js), which lets the plain
+   `.in` rule below out-rank it. With :is() here instead, the hiding rule
+   outweighed `.in` and revealed content stayed invisible. */
+.js :where(section:not(.hero):not(.page-head) > .wrap)
+  > :where(h2, h3, p, .eyebrow, .prose, .grid, figure, .table-scroll, .note,
+           .doclist, .people, .stat-row, details.bib, dl.kv, .next-prev),
+.js :where(section:not(.hero):not(.page-head) > .wrap > .prose-wide)
+  > :where(h2, h3, p, .finding, .note, .next-prev) {
   opacity: 0;
   transform: translateY(20px);
 }

@@ -20,6 +20,9 @@ def main():
     if subprocess.call([sys.executable, os.path.join(ROOT, "tools", "check_links.py")],
                        stdout=subprocess.DEVNULL) != 0:
         print("link check failed — not packaging"); return 1
+    if subprocess.call([sys.executable, os.path.join(ROOT, "tools", "check_render.py")],
+                       stdout=subprocess.DEVNULL) != 0:
+        print("render check failed — pages have blank regions, not packaging"); return 1
 
     out_dir = os.path.join(ROOT, "dist")
     os.makedirs(out_dir, exist_ok=True)
