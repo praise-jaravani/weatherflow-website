@@ -209,17 +209,25 @@ reproduced here, is in the papers themselves.</p>
 <div class="wrap">
 <div class="prose">
 <h2>About this site</h2>
-<p>Static HTML and one hand-written stylesheet. No framework, no build step at
-view time, no JavaScript, and no external requests &mdash; every asset,
-including the two typefaces, is served from this archive by relative path, so
-the site renders identically whether it is opened from a web server or straight
-off disk.</p>
+<p>Static HTML, one hand-written stylesheet and one small script. No framework,
+no build step at view time, and <strong>no external requests</strong> &mdash;
+every asset, including the two typefaces, is served from this archive by
+relative path, so the site renders identically whether it is opened from a web
+server or straight off disk.</p>
+
+<p>The script is progressive enhancement only: it adds scroll reveals, a reading
+-progress indicator and the counting statistics. With scripting disabled the
+site is fully readable and every link works &mdash; nothing is hidden behind
+JavaScript. All motion is suppressed for visitors whose system requests reduced
+motion.</p>
 
 <dl class="kv" style="margin-top:1.5rem">
 <dt>Markup</dt><dd>Hand-written HTML, validated against the W3C Nu HTML Checker</dd>
-<dt>Styling</dt><dd>One stylesheet, CSS custom properties, grid and flexbox; light and dark palettes</dd>
+<dt>Styling</dt><dd>One stylesheet &mdash; CSS custom properties, grid, flexbox; no preprocessor</dd>
+<dt>Scripting</dt><dd>One 4&nbsp;KB script, no dependencies; enhancement only, honours reduced-motion</dd>
 <dt>Typefaces</dt><dd>Source Serif 4 and Inter, both SIL Open Font License 1.1, subset to Latin and vendored locally</dd>
 <dt>Figures</dt><dd>Extracted from the final-paper PDFs at 240&nbsp;dpi</dd>
+<dt>Hero graphic</dt><dd>SVG generated from the project's own station coordinates</dd>
 <dt>External links</dt><dd>One, to the departmental project archive, labelled where it appears</dd>
 </dl>
 

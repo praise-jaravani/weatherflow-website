@@ -92,6 +92,7 @@ HEAD = """<!DOCTYPE html>
 <meta name="author" content="Génevieve Chikwanha, Zoleka Fuyana, Praise Jaravani">
 <link rel="stylesheet" href="assets/css/main.css">
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<script>document.documentElement.className+=" js";</script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -103,6 +104,7 @@ HEAD = """<!DOCTYPE html>
 {navitems}
 </ul>
 </nav>
+<div class="progress" aria-hidden="true"></div>
 </div>
 </header>
 <main id="main">
@@ -156,6 +158,7 @@ Research Foundation of South Africa (ref. PMDS251030376307).</p>
 </div>
 </div>
 </footer>
+<script src="assets/js/main.js" defer></script>
 </body>
 </html>
 """

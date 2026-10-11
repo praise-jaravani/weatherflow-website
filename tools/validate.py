@@ -14,14 +14,25 @@ def nu(path):
     return json.load(urllib.request.urlopen(req, timeout=60)).get("messages", [])
 
 def css(path):
+    """The CSS validator's urlencoded endpoint 500s on a stylesheet this
+    size; the multipart upload endpoint handles it."""
+    import uuid
     data = open(path, "rb").read()
-    body = urllib.parse.urlencode({
-        "text": data.decode("utf-8"), "profile": "css3svg",
-        "output": "json", "warning": "0"}).encode()
-    req = urllib.request.Request("https://jigsaw.w3.org/css-validator/validator",
-                                 data=body, headers=UA)
-    r = json.load(urllib.request.urlopen(req, timeout=90))["cssvalidation"]
+    b = "----wf" + uuid.uuid4().hex
+    parts = []
+    for k, v in (("output", "json"), ("profile", "css3svg"), ("warning", "no")):
+        parts.append(f"--{b}\r\nContent-Disposition: form-data; name=\"{k}\"\r\n\r\n{v}\r\n".encode())
+    parts.append(f"--{b}\r\nContent-Disposition: form-data; name=\"file\"; "
+                 f"filename=\"main.css\"\r\nContent-Type: text/css\r\n\r\n".encode()
+                 + data + b"\r\n")
+    parts.append(f"--{b}--\r\n".encode())
+    body = b"".join(parts)
+    req = urllib.request.Request(
+        "https://jigsaw.w3.org/css-validator/validator", data=body,
+        headers={**UA, "Content-Type": f"multipart/form-data; boundary={b}"})
+    r = json.load(urllib.request.urlopen(req, timeout=120))["cssvalidation"]
     return r.get("errors", []), r.get("result", {})
+
 
 fail = 0
 print("  HTML — W3C Nu checker")

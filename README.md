@@ -9,10 +9,14 @@ Supervisor: A/Prof Deshendran Moodley
 
 ## The site
 
-Static HTML and one hand-written stylesheet. No framework, no JavaScript, no
-build step at view time and **no external requests** — every asset, including
-both typefaces, is served by relative path, so the site renders identically from
-a web server or opened straight off disk.
+Static HTML, one hand-written stylesheet and one small dependency-free script.
+No framework, no build step at view time and **no external requests** — every
+asset, including both typefaces, is served by relative path, so the site renders
+identically from a web server or opened straight off disk.
+
+The script is progressive enhancement only (scroll reveals, reading progress,
+counting stats). With scripting disabled the site is fully readable and every
+link works; all motion is suppressed under `prefers-reduced-motion`.
 
 | | |
 |---|---|
@@ -21,6 +25,7 @@ a web server or opened straight off disk.
 | External links | 1 (the departmental project archive) |
 | HTML validation | 0 errors, 0 warnings — W3C Nu checker |
 | CSS validation | valid — W3C CSS validator |
+| Renders from `file://` | verified in headless Chrome |
 
 ## Layout
 
@@ -33,6 +38,7 @@ a web server or opened straight off disk.
     resources.html          documents, source code, data statement, citation
     assets/
       css/                  main.css — the only stylesheet
+      js/                   main.js — progressive enhancement only
       fonts/                Source Serif 4, Inter (OFL 1.1), Latin subsets
       img/figures/          figures extracted from the final-paper PDFs
       docs/                 proposal, poster, final papers
@@ -48,6 +54,7 @@ stays identical across every page.
     python3 tools/build.py          # regenerate the 7 pages
     python3 tools/check_links.py    # every relative link and anchor
     python3 tools/validate.py       # W3C HTML + CSS validators (needs network)
+    python3 tools/make_network_svg.py # regenerate the hero constellation
     python3 tools/make_submission.py  # build the submission ZIP
 
 Always rebuild after editing a fragment — the root `.html` files are generated.
