@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WeatherFLOW — Weather prediction using spatio-temporal graph neural networks</title>
+<meta name="description" content="Honours project comparing continuous-time, diffusion-based and lightweight spatio-temporal graph neural networks for weather forecasting on South African weather-station data.">
+<meta name="author" content="Génevieve Chikwanha, Zoleka Fuyana, Praise Jaravani">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<div class="wrap">
+<a class="brand" href="index.html"><svg class="mark" viewBox="0 0 24 24" width="19" height="19" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="7" r="1.9"/><circle cx="18" cy="5.5" r="1.9"/><circle cx="12" cy="13" r="1.9"/><circle cx="19" cy="17.5" r="1.9"/><circle cx="5.5" cy="18" r="1.9"/><path d="M6.6 8.2 10.6 11.8M16.2 6.4 13.2 11.3M13.5 14.2 17.2 16.4M10.4 14.2 6.8 16.6M6.9 7.3h9.3"/></svg><span>WeatherFLOW</span> <span class="sub">UCT&nbsp;Honours&nbsp;2026</span></a>
+<nav class="site-nav" aria-label="Main">
+<ul>
+<li><a href="index.html" aria-current="page">Overview</a></li>
+<li><a href="background.html">Background</a></li>
+<li><a href="results.html">Results</a></li>
+<li><a href="continuous-time.html">Continuous-time</a></li>
+<li><a href="diffusion.html">Diffusion</a></li>
+<li><a href="lightweight.html">Lightweight</a></li>
+<li><a href="resources.html">Resources</a></li>
+</ul>
+</nav>
+</div>
+</header>
+<main id="main">
+<section class="hero">
+<div class="wrap">
+<p class="eyebrow">Honours project &middot; CSC4002W &middot; University of Cape Town</p>
+<h1>WeatherFLOW</h1>
+<p class="tagline">Do newer spatio-temporal graph neural networks forecast South
+African weather better than the models we already had &mdash; and do they hold up
+when the weather is extreme?</p>
+
+<p class="byline">
+<a href="diffusion.html">Génevieve Chikwanha</a><span class="sep">&middot;</span>
+<a href="lightweight.html">Zoleka Fuyana</a><span class="sep">&middot;</span>
+<a href="continuous-time.html">Praise Jaravani</a>
+</p>
+<p class="affil">Supervised by A/Prof Deshendran Moodley &middot; Department of
+Computer Science, University of Cape Town &middot; 2026</p>
+
+<ul class="pill-row">
+<li><a class="pill primary" href="results.html">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 20h18M6 16V9M11 16V5M16 16v-4M21 16v-8"/></svg>
+Read the results</a></li>
+<li><a class="pill" href="assets/docs/weatherflow-poster.pdf">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 3h16v18H4zM8 8h8M8 12h8M8 16h5"/></svg>
+Poster (PDF)</a></li>
+<li><a class="pill" href="resources.html#papers">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5"/></svg>
+Final papers</a></li>
+<li><a class="pill" href="resources.html#code">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 17-5-5 5-5M15 7l5 5-5 5"/></svg>
+Source code</a></li>
+</ul>
+
+<div class="stat-row">
+<div class="stat"><span class="n">32</span><span class="l">SAWS weather stations</span></div>
+<div class="stat"><span class="n">10</span><span class="l">years, hourly (2016&ndash;2025)</span></div>
+<div class="stat"><span class="n">8</span><span class="l">STGNN architectures</span></div>
+<div class="stat"><span class="n">4</span><span class="l">forecast variables</span></div>
+<div class="stat"><span class="n">48 h</span><span class="l">maximum forecast lead</span></div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+<div class="prose">
+<h2>What this project did</h2>
+<p>Weather at one station depends on its own recent past <em>and</em> on what is
+happening at nearby stations. Spatio-temporal graph neural networks
+(<abbr title="spatio-temporal graph neural networks">STGNNs</abbr>) capture both
+at once by treating each station as a node in a graph whose edges carry the
+strength of the dependency between sites. Two earlier UCT honours projects
+established that this works for South African station data, but both stopped at
+a 24-hour horizon, both evaluated only discrete-time models, and neither treated
+extreme weather as a prediction target.</p>
+
+<p>WeatherFLOW tests three newer families of STGNN against those established
+baselines, on ten years of hourly observations from 32 South African Weather
+Service stations, out to <strong>48 hours</strong> &mdash; double the horizon of
+the prior work. All three families run through one shared pipeline, so the data,
+the chronological split, the loss, and the evaluation are held constant and the
+architecture is what varies.</p>
+</div>
+
+<div class="grid three" style="margin-top:2rem">
+<article class="card work ct">
+<p class="eyebrow" style="margin-bottom:.5rem">Workstream 1</p>
+<h3>Continuous-time</h3>
+<p class="who">Praise Jaravani</p>
+<p class="models">MTGODE &middot; STGODE</p>
+<p>Replaces discrete layers with a neural ODE, so depth becomes integration time
+and the latent trajectory is continuous.</p>
+<p class="more"><a href="continuous-time.html">Workstream and results &rarr;</a></p>
+</article>
+
+<article class="card work diff">
+<p class="eyebrow" style="margin-bottom:.5rem">Workstream 2</p>
+<h3>Diffusion-based</h3>
+<p class="who">Génevieve Chikwanha</p>
+<p class="models">DiffSTG &middot; USTD</p>
+<p>Generates the forecast by denoising, producing a distribution of possible
+futures rather than a single point prediction.</p>
+<p class="more"><a href="diffusion.html">Workstream and results &rarr;</a></p>
+</article>
+
+<article class="card work light">
+<p class="eyebrow" style="margin-bottom:.5rem">Workstream 3</p>
+<h3>Lightweight</h3>
+<p class="who">Zoleka Fuyana</p>
+<p class="models">STLGRU &middot; LiteSTGNN</p>
+<p>Asks how much accuracy survives when the parameter budget is cut hard &mdash;
+what capacity actually buys.</p>
+<p class="more"><a href="lightweight.html">Workstream and results &rarr;</a></p>
+</article>
+</div>
+
+<div class="note">
+<p><strong>Two shared baselines.</strong> Every workstream measures itself against
+the same two models, <b>AGCRN</b> and <b>CLCRN</b>, which were the strongest
+performers in the previous study on this data. Both are discrete-time: AGCRN
+learns its graph from trainable node embeddings, CLCRN builds its neighbourhoods
+from the stations' geographic coordinates. See
+<a href="background.html#baselines">Background</a> for what each one does.</p>
+</div>
+</div>
+</section>
+
+<section class="band">
+<div class="wrap">
+<p class="eyebrow">Accomplishments</p>
+<h2>What we found</h2>
+<div class="prose-wide">
+
+<div class="finding">
+<p class="eyebrow">Finding 1</p>
+<p><strong>The established baselines were hard to beat.</strong> None of the three
+new families delivered a clean win across all four variables. The 2023
+baselines remain competitive everywhere, and on several variables they are still
+the most accurate models tested.</p>
+</div>
+
+<div class="finding">
+<p class="eyebrow">Finding 2</p>
+<p><strong>How a model is conditioned matters more than which paradigm it
+belongs to.</strong> This is the clearest cross-cutting result. Within the
+continuous-time pair, the neural ODE lowered error with a learned adaptive graph
+and <em>raised</em> it with a geometric one &mdash; the interaction between the two
+design axes was larger than either axis alone. Within the diffusion pair, the
+model with a deterministic spatio-temporal encoder and station-height covariates
+(USTD) was competitive, while the one that diffuses directly (DiffSTG) was the
+weakest model in the whole study. Neither family succeeds or fails as a family.</p>
+</div>
+
+<div class="finding">
+<p class="eyebrow">Finding 3</p>
+<p><strong>Capacity does not buy accuracy.</strong> The most accurate
+continuous-time model has 138,096 parameters against 1,663,104 for the weakest,
+and CLCRN &mdash; the smallest model of the four &mdash; separates from the far
+larger STGODE on every variable. In the lightweight workstream, STLGRU is 4.1&times;
+the size of LiteSTGNN and improves MAE by only 0.7&ndash;5.7%.</p>
+</div>
+
+<div class="finding">
+<p class="eyebrow">Finding 4</p>
+<p><strong>Average accuracy does not predict accuracy on extremes.</strong>
+Stratifying test error by whether the observation exceeds its station's 95th
+percentile, every architecture degrades &mdash; by up to a factor of 3.5 on wind
+speed &mdash; and the model with the lowest pooled error is <em>not</em> the model
+with the lowest error in the tail on three of four variables. All of them follow
+the shape of an extreme event but flatten its amplitude.</p>
+</div>
+
+<div class="finding">
+<p class="eyebrow">Finding 5</p>
+<p><strong>The architectures converge as the horizon grows.</strong> The spread
+between models is widest at short lead and largely gone by two days &mdash; on
+surface pressure it falls from 47.3% of the mean near the first lead to 3.5% at
+48 hours. Which variable you are forecasting sets the error growth far more than
+which architecture you choose.</p>
+</div>
+
+</div>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+<p class="eyebrow">Shared foundation</p>
+<h2>One dataset, one pipeline</h2>
+<div class="prose">
+<p>The South African Weather Service supplied hourly observations from 60
+automatic weather stations across the Free State, Gauteng, KwaZulu-Natal and the
+Eastern Cape. Stations missing more than 10% of their observations were excluded,
+following the criterion used by the earlier studies, leaving <strong>32
+stations</strong> and 87,672 hourly timesteps per station over 2016&ndash;2025.
+Gaps were filled by inverse-distance weighting over neighbouring stations, and
+the record was split chronologically &mdash; 2016&ndash;2021 to train,
+2022&ndash;2023 to validate, 2024&ndash;2025 to test &mdash; <em>before</em> any
+normalisation statistic or threshold was computed, so no test information reaches
+training.</p>
+</div>
+
+<div class="grid two">
+<figure>
+<img src="assets/img/figures/jaravani-fig2.png" width="842" height="830"
+  alt="Map of South Africa with 32 weather-station markers concentrated in the eastern half of the country, across the Free State, Gauteng, KwaZulu-Natal and the Eastern Cape.">
+<figcaption><b>The 32-station SAWS network, 2016&ndash;2025.</b> The network is
+concentrated in the eastern half of the country, so the results characterise
+South Africa's predominantly summer-rainfall east rather than the winter-rainfall
+south-west.
+<span class="src">Figure 2, Jaravani (2026).</span></figcaption>
+</figure>
+
+<figure>
+<img src="assets/img/figures/chikwanha-fig1.png" width="842" height="719"
+  alt="Map showing the provinces covered by the SAWS dataset with each retained weather station marked.">
+<figcaption><b>Station coverage by province.</b> Of the 32 retained stations, 13
+are in the Eastern Cape, 12 in KwaZulu-Natal, 5 in the Free State and 2 in
+Gauteng.
+<span class="src">Figure 1, Chikwanha (2026).</span></figcaption>
+</figure>
+</div>
+
+<figure>
+<img src="assets/img/figures/jaravani-fig1.png" width="842" height="232"
+  alt="Flow diagram: raw SAWS records feed preprocessing, then a chronological split, which feeds both extreme-event thresholds computed on training data only and model configuration, both of which feed a shared training harness that runs Phase 1 regression and Phase 2 detection before statistical comparison.">
+<figcaption><b>The shared WeatherFLOW pipeline.</b> Upstream model repositories
+are vendored at pinned commits and never modified; each integration is an adapter
+behind a common interface, so every architecture sees the same preprocessed
+tensors, splits, loss, optimiser and evaluation suite.
+<span class="src">Figure 1, Jaravani (2026).</span></figcaption>
+</figure>
+
+<div class="table-scroll">
+<table>
+<caption><b>Shared experimental setup.</b> Held constant across all three
+workstreams. Where a workstream departs from this, the departure is stated on
+its own page and in <a href="results.html#protocols">Results</a>.</caption>
+<tbody>
+<tr><th scope="row">Source</th><td>South African Weather Service, automatic weather stations</td></tr>
+<tr><th scope="row">Stations</th><td>32 (filtered from 60 at a 10% missingness threshold)</td></tr>
+<tr><th scope="row">Period</th><td>1 January 2016 &ndash; 31 December 2025, hourly</td></tr>
+<tr><th scope="row">Timesteps</th><td>87,672 per station</td></tr>
+<tr><th scope="row">Recorded variables</th><td>temperature, rainfall, relative humidity, wind direction, wind speed, surface pressure</td></tr>
+<tr><th scope="row">Forecast targets</th><td>temperature, surface pressure, relative humidity, wind speed</td></tr>
+<tr><th scope="row">Imputation</th><td>inverse-distance weighting over nearest neighbouring stations</td></tr>
+<tr><th scope="row">Split</th><td>chronological 60 / 20 / 20 &mdash; train 2016&ndash;2021, validate 2022&ndash;2023, test 2024&ndash;2025</td></tr>
+<tr><th scope="row">Normalisation</th><td>z-score, fitted on the training partition only</td></tr>
+<tr><th scope="row">Forecast horizon</th><td>48 hours, reported at 3, 6, 9, 12, 24 and 48 hours</td></tr>
+<tr><th scope="row">Training loss</th><td>mean absolute error, Adam optimiser, early stopping patience 15</td></tr>
+<tr><th scope="row">Compute</th><td>UCT ICTS High-Performance Computing cluster (NVIDIA A100 / L40S)</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section class="band" id="documents">
+<div class="wrap">
+<p class="eyebrow">Joint deliverables</p>
+<h2>Documents produced by the team</h2>
+<div class="prose">
+<p>Documents produced jointly by the project appear below. Each student's own
+literature review and final paper are linked from that student's page, and
+everything the project produced is collected on the
+<a href="resources.html">Resources</a> page.</p>
+</div>
+
+<ul class="doclist">
+<li><a href="assets/docs/weatherflow-poster.pdf">
+  <span class="t">Project poster</span>
+  <span class="d">The project on one page: objectives, data, models, results and conclusions.</span>
+  <span class="meta">PDF</span></a></li>
+<li><a href="assets/docs/project-proposal.pdf">
+  <span class="t">Project proposal</span>
+  <span class="d">Joint proposal motivating the research direction and setting out how the study would be conducted.</span>
+  <span class="meta">PDF &middot; 10 pp</span></a></li>
+</ul>
+
+<div class="note">
+<p><strong>Still to be added.</strong> The three individual literature reviews
+and the final paper for the lightweight workstream are not yet on this site.
+Every other document is linked and working.</p>
+</div>
+</div>
+</section>
+
+<section id="team">
+<div class="wrap">
+<p class="eyebrow">People</p>
+<h2>Team</h2>
+<ul class="people">
+<li><span class="nm">Génevieve Chikwanha</span>
+    <span class="rl">Diffusion-based STGNNs</span>
+    <a class="em" href="mailto:CHKKAR002@myuct.ac.za">CHKKAR002@myuct.ac.za</a></li>
+<li><span class="nm">Zoleka Fuyana</span>
+    <span class="rl">Lightweight STGNNs</span>
+    <a class="em" href="mailto:FYNZOL001@myuct.ac.za">FYNZOL001@myuct.ac.za</a></li>
+<li><span class="nm">Praise Jaravani</span>
+    <span class="rl">Continuous-time STGNNs</span>
+    <a class="em" href="mailto:JRVPRA001@myuct.ac.za">JRVPRA001@myuct.ac.za</a></li>
+<li><span class="nm">A/Prof Deshendran Moodley</span>
+    <span class="rl">Supervisor</span>
+    <a class="em" href="mailto:deshen.moodley@uct.ac.za">deshen.moodley@uct.ac.za</a></li>
+</ul>
+
+<div class="prose" style="margin-top:2rem">
+<h3>Acknowledgements</h3>
+<p>We thank the South African Weather Service for the station observations; UCT
+ICTS High-Performance Computing for the compute on which the experiments ran; and
+A/Prof Deshendran Moodley for supervision throughout. This work is based on
+research supported in part by the National Research Foundation of South Africa
+(ref. PMDS251030376307).</p>
+</div>
+</div>
+</section>
+</main>
+<footer class="site-footer">
+<div class="wrap">
+<div class="cols">
+<div>
+<h2>Project</h2>
+<ul>
+<li><a href="index.html">Overview</a></li>
+<li><a href="background.html">Background</a></li>
+<li><a href="results.html">Results</a></li>
+<li><a href="resources.html">Resources</a></li>
+</ul>
+</div>
+<div>
+<h2>Workstreams</h2>
+<ul>
+<li><a href="continuous-time.html">Continuous-time &mdash; Jaravani</a></li>
+<li><a href="diffusion.html">Diffusion-based &mdash; Chikwanha</a></li>
+<li><a href="lightweight.html">Lightweight &mdash; Fuyana</a></li>
+</ul>
+</div>
+<div>
+<h2>Key documents</h2>
+<ul>
+<li><a href="assets/docs/weatherflow-poster.pdf">Project poster (PDF)</a></li>
+<li><a href="assets/docs/final-paper-jaravani.pdf">Final paper &mdash; Jaravani (PDF)</a></li>
+<li><a href="assets/docs/final-paper-chikwanha.pdf">Final paper &mdash; Chikwanha (PDF)</a></li>
+</ul>
+</div>
+<div>
+<h2>Department</h2>
+<ul>
+<li>Department of Computer Science</li>
+<li>University of Cape Town</li>
+<li>Supervisor: A/Prof Deshendran Moodley</li>
+</ul>
+</div>
+</div>
+<div class="colophon">
+<p>WeatherFLOW &mdash; CSC4002W honours project, Department of Computer Science,
+University of Cape Town, 2026.</p>
+<p>Station observations supplied by the South African Weather Service and used
+under their data policy. Computation on the UCT ICTS High-Performance Computing
+cluster. This work is based on research supported in part by the National
+Research Foundation of South Africa (ref. PMDS251030376307).</p>
+</div>
+</div>
+</footer>
+</body>
+</html>

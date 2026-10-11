@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Results — WeatherFLOW</title>
+<meta name="description" content="Forecasting accuracy of eight STGNN architectures against two shared baselines on 32 South African weather stations, to 48 hours ahead.">
+<meta name="author" content="Génevieve Chikwanha, Zoleka Fuyana, Praise Jaravani">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<div class="wrap">
+<a class="brand" href="index.html"><svg class="mark" viewBox="0 0 24 24" width="19" height="19" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="7" r="1.9"/><circle cx="18" cy="5.5" r="1.9"/><circle cx="12" cy="13" r="1.9"/><circle cx="19" cy="17.5" r="1.9"/><circle cx="5.5" cy="18" r="1.9"/><path d="M6.6 8.2 10.6 11.8M16.2 6.4 13.2 11.3M13.5 14.2 17.2 16.4M10.4 14.2 6.8 16.6M6.9 7.3h9.3"/></svg><span>WeatherFLOW</span> <span class="sub">UCT&nbsp;Honours&nbsp;2026</span></a>
+<nav class="site-nav" aria-label="Main">
+<ul>
+<li><a href="index.html">Overview</a></li>
+<li><a href="background.html">Background</a></li>
+<li><a href="results.html" aria-current="page">Results</a></li>
+<li><a href="continuous-time.html">Continuous-time</a></li>
+<li><a href="diffusion.html">Diffusion</a></li>
+<li><a href="lightweight.html">Lightweight</a></li>
+<li><a href="resources.html">Resources</a></li>
+</ul>
+</nav>
+</div>
+</header>
+<main id="main">
+<section class="page-head">
+<div class="wrap">
+<p class="eyebrow">Findings</p>
+<h1>Results</h1>
+<p class="tagline">Eight architectures against two shared baselines, on 32 South
+African weather stations, out to 48 hours &mdash; reported workstream by
+workstream.</p>
+
+<nav class="toc" aria-label="On this page">
+<p>On this page</p>
+<ol>
+<li><a href="#protocols">How to read this page</a></li>
+<li><a href="#ct">Continuous-time workstream</a></li>
+<li><a href="#diff">Diffusion-based workstream</a></li>
+<li><a href="#light">Lightweight workstream</a></li>
+<li><a href="#common">What holds across all three</a></li>
+</ol>
+</nav>
+</div>
+</section>
+
+<section id="protocols">
+<div class="wrap">
+<h2>How to read this page</h2>
+<div class="prose">
+<p>All three workstreams share the dataset, the chronological split, the
+preprocessing, the training loss and the 48-hour horizon, and all three measure
+against the same two baselines. They do <strong>not</strong> share the number of
+random seeds, the input regime, or the full metric set, because each workstream's
+research question demanded something different.</p>
+
+<p>Results are therefore reported <strong>per workstream, against the shared
+baselines</strong> &mdash; the comparison each study actually ran. Numbers are
+not merged into a single ranking across workstreams, because the differing seed
+budgets and input regimes mean a cross-workstream difference of a few percent
+cannot be attributed to the architecture.</p>
+</div>
+
+<div class="note">
+<p><strong>Where this matters in practice.</strong> The two workstreams reporting
+here agree closely on AGCRN &mdash; 2.197&nbsp;&deg;C and 2.194&nbsp;&deg;C
+average temperature MAE, computed independently. They differ on CLCRN
+(2.410 against 2.146&nbsp;&deg;C) because one CLCRN run out of the
+continuous-time workstream's ten temperature seeds failed to converge and was
+deliberately retained in the reported mean rather than discarded. Excluding that
+run, the two agree on CLCRN as well. The divergent run is discussed in
+<a href="continuous-time.html#stability">the continuous-time workstream</a>; it
+is a reliability finding, not a discrepancy to be smoothed over.</p>
+</div>
+
+<div class="table-scroll">
+<table>
+<caption><b>Protocol by workstream.</b> Everything not listed here is shared
+&mdash; see the <a href="index.html#documents">shared experimental setup</a>.</caption>
+<thead>
+<tr>
+<th scope="col">&nbsp;</th>
+<th scope="col">Continuous-time</th>
+<th scope="col">Diffusion-based</th>
+<th scope="col">Lightweight</th>
+</tr>
+</thead>
+<tbody>
+<tr><th scope="row">Student</th><td>Praise Jaravani</td><td>Génevieve Chikwanha</td><td>Zoleka Fuyana</td></tr>
+<tr><th scope="row">Challengers</th><td>MTGODE, STGODE</td><td>DiffSTG, USTD</td><td>STLGRU, LiteSTGNN</td></tr>
+<tr><th scope="row">Random seeds</th><td>10 (42&ndash;51)</td><td>3 (2024, 2025, 2026)</td><td>To be confirmed</td></tr>
+<tr><th scope="row">Input regime</th><td>all six variables in, one target out</td><td>univariate per variable</td><td>To be confirmed</td></tr>
+<tr><th scope="row">Point metrics</th><td>MAE, RMSE, NRMSE</td><td>MAE, RMSE</td><td>To be confirmed</td></tr>
+<tr><th scope="row">Additional metrics</th><td>valid forecast horizon; PR-AUC, F1, CSI for extreme-event detection</td><td>CRPS for probabilistic forecasts</td><td>parameter count, inference cost</td></tr>
+<tr><th scope="row">Extra analyses</th><td>extreme-stratified error, 2&times;2 factorial design, named heatwave case study, seed stability</td><td>exogenous-covariate ablation, spatial and elevation error patterns, learned adjacency maps</td><td>capacity&ndash;accuracy trade-off</td></tr>
+<tr><th scope="row">Hardware</th><td>NVIDIA L40S</td><td>NVIDIA A100</td><td>To be confirmed</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section class="band" id="ct">
+<div class="wrap">
+<p class="eyebrow"><span class="tag ct">Workstream 1</span></p>
+<h2>Continuous-time: MTGODE and STGODE</h2>
+<div class="prose">
+<p>Four architectures, crossing the spatial prior (learned adaptive graph against
+geometric construction) with the temporal formulation (discrete recurrence
+against continuous-time neural ODE). Ten seeds per cell, 190 runs in total.</p>
+</div>
+
+<div class="table-scroll">
+<table>
+<caption><b>Test MAE by forecast lead</b>, means over ten seeds, in physical
+units. Lowest model per row in bold. Persistence holds the last observed value;
+climatology predicts the training-period mean.</caption>
+<thead>
+<tr>
+<th scope="col">Lead</th>
+<th scope="col">AGCRN</th><th scope="col">CLCRN</th>
+<th scope="col">MTGODE</th><th scope="col">STGODE</th>
+<th scope="col">Persist.</th><th scope="col">Clim.</th>
+</tr>
+</thead>
+<tbody class="group-head"><tr><th scope="rowgroup" colspan="7">Temperature (&deg;C)</th></tr></tbody>
+<tbody>
+<tr><th scope="row">3 h</th><td>1.417</td><td>1.711</td><td class="best">1.284</td><td>1.470</td><td>2.953</td><td>5.002</td></tr>
+<tr><th scope="row">6 h</th><td>1.730</td><td>1.983</td><td class="best">1.640</td><td>1.864</td><td>5.168</td><td>5.002</td></tr>
+<tr><th scope="row">9 h</th><td>1.844</td><td>2.095</td><td class="best">1.789</td><td>1.978</td><td>6.574</td><td>5.003</td></tr>
+<tr><th scope="row">12 h</th><td>1.886</td><td>2.143</td><td class="best">1.848</td><td>1.991</td><td>7.064</td><td>5.005</td></tr>
+<tr><th scope="row">24 h</th><td>2.181</td><td>2.402</td><td class="best">2.102</td><td>2.226</td><td>2.821</td><td>5.005</td></tr>
+<tr><th scope="row">48 h</th><td>2.713</td><td>2.910</td><td class="best">2.623</td><td>2.702</td><td>3.462</td><td>5.007</td></tr>
+<tr><th scope="row">Average</th><td>2.197</td><td>2.410</td><td class="best">2.108</td><td>2.256</td><td>5.318</td><td>5.005</td></tr>
+</tbody>
+<tbody class="group-head"><tr><th scope="rowgroup" colspan="7">Surface pressure (hPa)</th></tr></tbody>
+<tbody>
+<tr><th scope="row">3 h</th><td>2.049</td><td>1.845</td><td class="best">1.252</td><td>1.587</td><td>1.295</td><td>7.749</td></tr>
+<tr><th scope="row">6 h</th><td>2.434</td><td>2.183</td><td class="best">1.702</td><td>2.169</td><td>2.080</td><td>7.749</td></tr>
+<tr><th scope="row">9 h</th><td>2.753</td><td>2.467</td><td class="best">2.219</td><td>2.557</td><td>2.493</td><td>7.749</td></tr>
+<tr><th scope="row">12 h</th><td>3.051</td><td>2.765</td><td class="best">2.692</td><td>2.873</td><td>2.877</td><td>7.749</td></tr>
+<tr><th scope="row">24 h</th><td>4.207</td><td class="best">3.954</td><td>4.059</td><td>4.158</td><td>4.133</td><td>7.750</td></tr>
+<tr><th scope="row">48 h</th><td>5.365</td><td class="best">5.279</td><td>5.464</td><td>5.383</td><td>5.506</td><td>7.754</td></tr>
+<tr><th scope="row">Average</th><td>4.042</td><td class="best">3.817</td><td>3.818</td><td>3.948</td><td>4.005</td><td>7.750</td></tr>
+</tbody>
+<tbody class="group-head"><tr><th scope="rowgroup" colspan="7">Relative humidity (%)</th></tr></tbody>
+<tbody>
+<tr><th scope="row">3 h</th><td>6.570</td><td>6.263</td><td class="best">6.006</td><td>6.588</td><td>11.078</td><td>19.000</td></tr>
+<tr><th scope="row">6 h</th><td>8.003</td><td>7.648</td><td class="best">7.560</td><td>8.328</td><td>18.983</td><td>19.000</td></tr>
+<tr><th scope="row">9 h</th><td>8.619</td><td>8.244</td><td class="best">8.243</td><td>8.964</td><td>24.111</td><td>18.998</td></tr>
+<tr><th scope="row">12 h</th><td>8.931</td><td>8.587</td><td class="best">8.579</td><td>9.230</td><td>26.044</td><td>18.996</td></tr>
+<tr><th scope="row">24 h</th><td>10.014</td><td>9.709</td><td class="best">9.660</td><td>10.273</td><td>12.742</td><td>18.999</td></tr>
+<tr><th scope="row">48 h</th><td>11.493</td><td>11.337</td><td class="best">11.233</td><td>11.673</td><td>14.673</td><td>18.995</td></tr>
+<tr><th scope="row">Average</th><td>9.842</td><td>9.527</td><td class="best">9.454</td><td>10.075</td><td>20.361</td><td>18.997</td></tr>
+</tbody>
+<tbody class="group-head"><tr><th scope="rowgroup" colspan="7">Wind speed (m s<sup>&minus;1</sup>)</th></tr></tbody>
+<tbody>
+<tr><th scope="row">3 h</th><td>0.894</td><td>0.879</td><td class="best">0.855</td><td>0.901</td><td>1.099</td><td>1.497</td></tr>
+<tr><th scope="row">6 h</th><td>1.037</td><td>1.004</td><td class="best">0.989</td><td>1.061</td><td>1.550</td><td>1.497</td></tr>
+<tr><th scope="row">9 h</th><td>1.102</td><td>1.057</td><td class="best">1.048</td><td>1.124</td><td>1.820</td><td>1.497</td></tr>
+<tr><th scope="row">12 h</th><td>1.124</td><td>1.083</td><td class="best">1.076</td><td>1.142</td><td>1.935</td><td>1.497</td></tr>
+<tr><th scope="row">24 h</th><td>1.178</td><td>1.149</td><td class="best">1.139</td><td>1.184</td><td>1.476</td><td>1.497</td></tr>
+<tr><th scope="row">48 h</th><td>1.227</td><td>1.213</td><td class="best">1.203</td><td>1.227</td><td>1.558</td><td>1.497</td></tr>
+<tr><th scope="row">Average</th><td>1.149</td><td>1.120</td><td class="best">1.110</td><td>1.157</td><td>1.721</td><td>1.497</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="prose">
+<p>MTGODE attains the lowest horizon-averaged error on temperature, relative
+humidity and wind speed, and is statistically inseparable from CLCRN on surface
+pressure. Against the naive baselines the improvement divides sharply by
+variable: every model reaches roughly half of the better baseline's error on
+temperature and humidity and about three quarters on wind speed, but on surface
+pressure the four barely improve on persistence at all.</p>
+</div>
+
+<figure>
+<img src="assets/img/figures/jaravani-fig4.png" width="842" height="754"
+  alt="Four log-scale line charts of test MAE against forecast lead from 1 to 48 hours, for temperature, surface pressure, relative humidity and wind speed. The four model curves lie close together and converge as lead increases; the persistence baseline shows a pronounced diurnal sawtooth.">
+<figcaption><b>Error against forecast lead.</b> Log axes, means over ten seeds.
+The spread between architectures is widest at short lead and largely gone by two
+days. Persistence's diurnal sawtooth is visible &mdash; the models stay below it
+even at its minima, so they capture more than the daily cycle.
+<span class="src">Figure 4, Jaravani (2026).</span></figcaption>
+</figure>
+
+<figure>
+<img src="assets/img/figures/jaravani-fig5.png" width="842" height="671"
+  alt="Four interaction plots, one per variable. In each, the line for the learned adaptive graph slopes downward from discrete to continuous time while the line for the geometric prior slopes upward, so the two lines cross.">
+<figcaption><b>The lines cross on every variable.</b> Moving from a discrete to a
+continuous-time formulation <em>lowers</em> error under a learned adaptive graph
+(AGCRN&nbsp;&rarr;&nbsp;MTGODE) and <em>raises</em> it under a geometric prior
+(CLCRN&nbsp;&rarr;&nbsp;STGODE). The interaction is negative on all four
+variables, from &minus;3.3% to &minus;5.2% of the four-cell mean, and exceeds
+either design axis on its own.
+<span class="src">Figure 5, Jaravani (2026).</span></figcaption>
+</figure>
+
+<h3>Behaviour on extremes</h3>
+<div class="table-scroll">
+<table>
+<caption><b>Extreme-stratified test MAE</b> &mdash; error on hours exceeding the
+station's training 95th percentile, against all other hours, with the
+degradation factor in brackets. Means over ten seeds.</caption>
+<thead>
+<tr><th scope="col">Model</th><th scope="col">Temperature (&deg;C)</th><th scope="col">Pressure (hPa)</th><th scope="col">Humidity (%)</th><th scope="col">Wind speed (m s<sup>&minus;1</sup>)</th></tr>
+</thead>
+<tbody>
+<tr><th scope="row">AGCRN</th><td>3.77 / 2.11 (1.79)</td><td>7.50 / 3.66 (2.05)</td><td>9.97 / 9.82 (1.02)</td><td>3.54 / 1.06 (3.35)</td></tr>
+<tr><th scope="row">CLCRN</th><td>4.61 / 2.29 (2.02)</td><td>6.87 / 3.48 (1.97)</td><td>9.37 / 9.53 (0.98)</td><td>3.51 / 1.03 (3.42)</td></tr>
+<tr><th scope="row">MTGODE</th><td>4.02 / 2.00 (2.01)</td><td>7.65 / 3.41 (2.24)</td><td>9.54 / 9.44 (1.01)</td><td>3.46 / 1.02 (3.40)</td></tr>
+<tr><th scope="row">STGODE</th><td>4.01 / 2.16 (1.86)</td><td>7.63 / 3.55 (2.15)</td><td>10.24 / 10.04 (1.02)</td><td>3.69 / 1.06 (3.49)</td></tr>
+<tr class="baseline"><th scope="row">Persistence</th><td>8.83 / 5.12 (1.72)</td><td>6.74 / 3.79 (1.78)</td><td>18.54 / 20.54 (0.90)</td><td>4.22 / 1.63 (2.58)</td></tr>
+<tr class="baseline"><th scope="row">Climatology</th><td>13.16 / 4.55 (2.89)</td><td>18.30 / 6.58 (2.78)</td><td>31.78 / 17.58 (1.81)</td><td>4.69 / 1.37 (3.41)</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="prose">
+<p>How far error grows in the tail is set by the variable, not the architecture
+&mdash; steep on wind speed, moderate on temperature and pressure, and absent on
+relative humidity, whose upper tail is a bounded saturation region where variance
+compresses rather than expands. Critically, the pooled ordering does not survive
+stratification on three of four variables: a discrete-recurrence model holds the
+lowest extreme-regime error on temperature, pressure and humidity, while MTGODE
+&mdash; lowest on average &mdash; leads the tail only on wind speed.</p>
+</div>
+
+<div class="table-scroll">
+<table>
+<caption><b>Extreme-event detection</b>, PR-AUC and ROC-AUC per label variable,
+means over ten seeds. Labels are exceedances of a 95th percentile conditioned on
+station, day-of-year and hour-of-day, so a classifier that knows only the
+calendar has no advantage. Best in bold.</caption>
+<thead>
+<tr><th scope="col">Model</th>
+<th scope="col" colspan="2">Temperature</th>
+<th scope="col" colspan="2">Precipitation</th>
+<th scope="col" colspan="2">Humidity</th>
+<th scope="col" colspan="2">Wind speed</th></tr>
+<tr><th scope="col">&nbsp;</th>
+<th scope="col">PR</th><th scope="col">ROC</th>
+<th scope="col">PR</th><th scope="col">ROC</th>
+<th scope="col">PR</th><th scope="col">ROC</th>
+<th scope="col">PR</th><th scope="col">ROC</th></tr>
+</thead>
+<tbody>
+<tr><th scope="row">AGCRN</th><td>.167</td><td>.729</td><td>.020</td><td>.754</td><td>.215</td><td>.662</td><td>.096</td><td>.674</td></tr>
+<tr><th scope="row">CLCRN</th><td>.205</td><td>.769</td><td class="best">.026</td><td>.794</td><td>.235</td><td>.696</td><td>.110</td><td>.690</td></tr>
+<tr><th scope="row">MTGODE</th><td class="best">.218</td><td class="best">.780</td><td class="best">.026</td><td class="best">.796</td><td class="best">.254</td><td class="best">.716</td><td class="best">.132</td><td class="best">.720</td></tr>
+<tr class="baseline"><th scope="row">Persistence</th><td>.106</td><td>&mdash;</td><td>.006</td><td>&mdash;</td><td>.165</td><td>&mdash;</td><td>.057</td><td>&mdash;</td></tr>
+<tr class="baseline"><th scope="row">Seasonal climatology</th><td>.061</td><td>&mdash;</td><td>.006</td><td>&mdash;</td><td>.093</td><td>&mdash;</td><td>.035</td><td>&mdash;</td></tr>
+<tr class="baseline"><th scope="row">Base rate (prevalence)</th><td>.065</td><td>.500</td><td>.007</td><td>.500</td><td>.117</td><td>.500</td><td>.043</td><td>.500</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="prose"><a href="continuous-time.html">Full continuous-time workstream &rarr;</a></p>
+</div>
+</section>
+
+<section id="diff">
+<div class="wrap">
+<p class="eyebrow"><span class="tag diff">Workstream 2</span></p>
+<h2>Diffusion-based: DiffSTG and USTD</h2>
+<div class="prose">
+<p>Two probabilistic diffusion models against the same two deterministic
+baselines, with CRPS added to assess the quality of the predictive distribution
+rather than only the point forecast. Three seeds per cell; the diffusion models
+produce eight samples per run, averaged for comparison with the baselines.</p>
+</div>
+
+<div class="table-scroll">
+<table>
+<caption><b>Average forecasting performance</b> across all stations and horizons,
+mean &plusmn; standard deviation over three seeds. Best per column in bold.</caption>
+<thead>
+<tr><th scope="col">Model</th>
+<th scope="col" colspan="2">Humidity (%)</th>
+<th scope="col" colspan="2">Pressure (hPa)</th>
+<th scope="col" colspan="2">Temperature (&deg;C)</th>
+<th scope="col" colspan="2">Wind speed (m s<sup>&minus;1</sup>)</th></tr>
+<tr><th scope="col">&nbsp;</th>
+<th scope="col">MAE</th><th scope="col">RMSE</th>
+<th scope="col">MAE</th><th scope="col">RMSE</th>
+<th scope="col">MAE</th><th scope="col">RMSE</th>
+<th scope="col">MAE</th><th scope="col">RMSE</th></tr>
+</thead>
+<tbody>
+<tr><th scope="row">AGCRN</th>
+<td>9.923</td><td>13.974</td><td>4.340</td><td>10.470</td>
+<td>2.194</td><td>3.019</td><td>1.125</td><td>1.604</td></tr>
+<tr><th scope="row">CLCRN</th>
+<td class="best">9.519</td><td class="best">13.231</td><td class="best">3.883</td><td class="best">8.857</td>
+<td class="best">2.146</td><td class="best">2.907</td><td class="best">1.122</td><td class="best">1.580</td></tr>
+<tr><th scope="row">DiffSTG</th>
+<td>11.137</td><td>14.883</td><td>6.369</td><td>13.904</td>
+<td>2.372</td><td>3.183</td><td>1.170</td><td>1.650</td></tr>
+<tr><th scope="row">USTD</th>
+<td>9.965</td><td>13.867</td><td>4.329</td><td>9.117</td>
+<td>2.209</td><td>2.974</td><td>1.151</td><td>1.647</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="prose">
+<p>CLCRN is the best point forecaster on every variable and metric. DiffSTG is
+the worst on every variable and metric &mdash; its pressure MAE is roughly 47%
+higher than USTD's and 64% higher than CLCRN's. USTD is the competitive one: it
+tracks AGCRN within 3% on MAE for every variable, and beats it by 12.9% on
+pressure RMSE.</p>
+
+<p>The gap between the two diffusion models is the finding. Both are diffusion
+models and both are non-autoregressive, so neither property explains the
+difference. What separates them is <strong>conditioning</strong>: USTD puts a
+deterministic spatio-temporal encoder in front of the diffusion transformer, so
+denoising operates on a representation that has already captured conditional
+structure, and it conditions on time of day, day of year and station height.</p>
+</div>
+
+<figure>
+<img src="assets/img/figures/chikwanha-fig3.png" width="842" height="634"
+  alt="Four line charts of RMSE against forecast horizons of 3, 6, 9, 12, 24 and 48 hours for humidity, pressure, temperature and wind speed, comparing CLCRN, AGCRN, DiffSTG and USTD. All curves rise with horizon; DiffSTG is consistently highest.">
+<figcaption><b>RMSE across forecast horizons.</b> All models degrade as lead
+grows. DiffSTG produces the highest error at every horizon on every variable;
+USTD and AGCRN are closest at short lead, with CLCRN and AGCRN generally ahead
+between 6 and 24 hours. All four converge by 48 hours.
+<span class="src">Figure 3, Chikwanha (2026).</span></figcaption>
+</figure>
+
+<figure>
+<img src="assets/img/figures/chikwanha-fig2.png" width="842" height="633"
+  alt="Four grouped bar charts showing USTD's MAE and RMSE for temperature, pressure, humidity and wind speed under three conditions: all exogenous variables, time of day only, and no exogenous variables. Error rises as covariates are removed, most sharply for pressure.">
+<figcaption><b>Ablation: what the covariates are worth.</b> Removing all
+exogenous variables raises USTD's RMSE from 2.974 to 3.411 on temperature, 13.867
+to 14.523 on humidity, 1.647 to 1.737 on wind speed &mdash; and from 9.117 to
+13.230 on pressure, a 45% deterioration. Contextual information, not the
+diffusion formulation, is doing much of the work.
+<span class="src">Figure 2, Chikwanha (2026).</span></figcaption>
+</figure>
+
+<div class="table-scroll">
+<table>
+<caption><b>Probabilistic performance (CRPS)</b>, averaged over the test set.
+Lower is better. CRPS scores the whole predictive distribution, where MAE and
+RMSE score only a point.</caption>
+<thead>
+<tr><th scope="col">Variable</th><th scope="col">DiffSTG</th><th scope="col">USTD</th><th scope="col">Better</th></tr>
+</thead>
+<tbody>
+<tr><th scope="row">Surface pressure</th><td>0.0060</td><td class="best">0.0043</td><td>USTD</td></tr>
+<tr><th scope="row">Temperature</th><td>0.1076</td><td class="best">0.1045</td><td>USTD</td></tr>
+<tr><th scope="row">Relative humidity</th><td>0.1266</td><td class="best">0.1219</td><td>USTD</td></tr>
+<tr><th scope="row">Wind speed</th><td class="best">0.3745</td><td>0.4073</td><td>DiffSTG</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="prose">
+<p>USTD achieves both lower point error and lower distributional error on three
+of four variables. Wind speed is the exception and is instructive: USTD's samples
+are visibly more dispersed there and its MAE is slightly lower, yet its CRPS is
+worse &mdash; so sample spread is not itself a measure of uncertainty quality.
+Whether dispersion helps depends on how well the resulting distribution matches
+the observations.</p>
+</div>
+
+<p class="prose"><a href="diffusion.html">Full diffusion workstream &rarr;</a></p>
+</div>
+</section>
+
+<section class="band" id="light">
+<div class="wrap">
+<p class="eyebrow"><span class="tag light">Workstream 3</span></p>
+<h2>Lightweight: STLGRU and LiteSTGNN</h2>
+
+<div class="note">
+<p><strong>Results pending.</strong> The final paper for this workstream is not
+yet available to this site, so the full result tables and figures are not posted.
+The summary below is from the project poster and is accurate but not complete.
+This section will be filled in when the paper is added.</p>
+</div>
+
+<div class="prose">
+<p>The lightweight workstream asks what the parameter budget actually buys.
+Its headline result is that adding capacity to a small model gives sharply
+diminishing returns: <strong>STLGRU is 4.1&times; the size of LiteSTGNN and
+improves MAE by only 0.7&ndash;5.7%</strong>. Performance was competitive with
+the baselines but variable-dependent &mdash; which family wins depends on which
+variable is being forecast.</p>
+
+<p>This is the same pattern the continuous-time workstream found from the
+opposite direction, where the most accurate model of four was also among the
+cheapest, at 138,096 parameters against 1,663,104 for the weakest, and the
+smallest model of the four separated from the largest on every variable.
+Across both workstreams, model size and model accuracy are close to unrelated on
+this dataset.</p>
+</div>
+
+<p class="prose"><a href="lightweight.html">Full lightweight workstream &rarr;</a></p>
+</div>
+</section>
+
+<section id="common">
+<div class="wrap">
+<h2>What holds across all three</h2>
+<div class="prose-wide">
+<p>Four patterns appear in every workstream that reported, despite the different
+architectures, metrics and seed budgets.</p>
+
+<div class="finding">
+<p class="eyebrow">1 &middot; The variable matters more than the architecture</p>
+<p>Error growth with lead time, the size of the gap to the naive baselines, and
+the degradation on extremes are all set far more by which variable is being
+forecast than by which model is forecasting it. The spread between architectures
+is 4&ndash;6% of the mean on most variables; the spread between variables is
+much larger. Station difficulty, likewise, is a property of the site: the four
+continuous-time models rank the 32 stations near-identically, with per-station
+error correlations of 0.98 to 1.00.</p>
+</div>
+
+<div class="finding">
+<p class="eyebrow">2 &middot; Models converge by 48 hours</p>
+<p>Whatever separates the architectures at short lead has largely disappeared by
+two days. On surface pressure the spread falls from 47.3% of the mean near the
+first lead to 3.5% at 48 hours. A ranking established at the previous studies'
+24-hour ceiling does not straightforwardly extend past it.</p>
+</div>
+
+<div class="finding">
+<p class="eyebrow">3 &middot; Surface pressure is the hard case</p>
+<p>It is the variable where the learned models struggle most to beat persistence
+&mdash; at the shortest lead every model's pressure error is 1.8 to 3.5 times
+persistence's, and the four only overtake it by two days. It is also where the
+models disagree most with one another, where seed-to-seed variation is highest,
+and where the exogenous-covariate ablation bites hardest. Altitude spread across
+the network is the likely common cause.</p>
+</div>
+
+<div class="finding">
+<p class="eyebrow">4 &middot; Conditioning beats paradigm</p>
+<p>In both reporting workstreams, the within-family gap was larger than the
+family-versus-baseline gap, and in both cases the explanation was how the model
+is conditioned on space and context &mdash; a learned graph against a geometric
+one, a deterministic encoder with covariates against raw diffusion. Adopting a
+new paradigm is not what improves a forecast; conditioning it well is.</p>
+</div>
+
+<div class="next-prev">
+<span><a href="background.html">&larr; Background</a></span>
+<span><a href="resources.html">Resources &rarr;</a></span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="site-footer">
+<div class="wrap">
+<div class="cols">
+<div>
+<h2>Project</h2>
+<ul>
+<li><a href="index.html">Overview</a></li>
+<li><a href="background.html">Background</a></li>
+<li><a href="results.html">Results</a></li>
+<li><a href="resources.html">Resources</a></li>
+</ul>
+</div>
+<div>
+<h2>Workstreams</h2>
+<ul>
+<li><a href="continuous-time.html">Continuous-time &mdash; Jaravani</a></li>
+<li><a href="diffusion.html">Diffusion-based &mdash; Chikwanha</a></li>
+<li><a href="lightweight.html">Lightweight &mdash; Fuyana</a></li>
+</ul>
+</div>
+<div>
+<h2>Key documents</h2>
+<ul>
+<li><a href="assets/docs/weatherflow-poster.pdf">Project poster (PDF)</a></li>
+<li><a href="assets/docs/final-paper-jaravani.pdf">Final paper &mdash; Jaravani (PDF)</a></li>
+<li><a href="assets/docs/final-paper-chikwanha.pdf">Final paper &mdash; Chikwanha (PDF)</a></li>
+</ul>
+</div>
+<div>
+<h2>Department</h2>
+<ul>
+<li>Department of Computer Science</li>
+<li>University of Cape Town</li>
+<li>Supervisor: A/Prof Deshendran Moodley</li>
+</ul>
+</div>
+</div>
+<div class="colophon">
+<p>WeatherFLOW &mdash; CSC4002W honours project, Department of Computer Science,
+University of Cape Town, 2026.</p>
+<p>Station observations supplied by the South African Weather Service and used
+under their data policy. Computation on the UCT ICTS High-Performance Computing
+cluster. This work is based on research supported in part by the National
+Research Foundation of South Africa (ref. PMDS251030376307).</p>
+</div>
+</div>
+</footer>
+</body>
+</html>

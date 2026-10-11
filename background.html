@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Background — WeatherFLOW</title>
+<meta name="description" content="The forecasting problem, how spatio-temporal graph neural networks model it, and the three-study South African research lineage this project extends.">
+<meta name="author" content="Génevieve Chikwanha, Zoleka Fuyana, Praise Jaravani">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<div class="wrap">
+<a class="brand" href="index.html"><svg class="mark" viewBox="0 0 24 24" width="19" height="19" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="7" r="1.9"/><circle cx="18" cy="5.5" r="1.9"/><circle cx="12" cy="13" r="1.9"/><circle cx="19" cy="17.5" r="1.9"/><circle cx="5.5" cy="18" r="1.9"/><path d="M6.6 8.2 10.6 11.8M16.2 6.4 13.2 11.3M13.5 14.2 17.2 16.4M10.4 14.2 6.8 16.6M6.9 7.3h9.3"/></svg><span>WeatherFLOW</span> <span class="sub">UCT&nbsp;Honours&nbsp;2026</span></a>
+<nav class="site-nav" aria-label="Main">
+<ul>
+<li><a href="index.html">Overview</a></li>
+<li><a href="background.html" aria-current="page">Background</a></li>
+<li><a href="results.html">Results</a></li>
+<li><a href="continuous-time.html">Continuous-time</a></li>
+<li><a href="diffusion.html">Diffusion</a></li>
+<li><a href="lightweight.html">Lightweight</a></li>
+<li><a href="resources.html">Resources</a></li>
+</ul>
+</nav>
+</div>
+</header>
+<main id="main">
+<section class="page-head">
+<div class="wrap">
+<p class="eyebrow">Context</p>
+<h1>Background</h1>
+<p class="tagline">What makes station weather forecasting a graph problem, what
+spatio-temporal graph neural networks do about it, and the three-study South
+African lineage this project continues.</p>
+
+<nav class="toc" aria-label="On this page">
+<p>On this page</p>
+<ol>
+<li><a href="#problem">The forecasting problem</a></li>
+<li><a href="#graphs">Why a graph</a></li>
+<li><a href="#anatomy">Anatomy of an STGNN</a></li>
+<li><a href="#baselines">The two shared baselines</a></li>
+<li><a href="#families">The three families we tested</a></li>
+<li><a href="#lineage">The South African lineage</a></li>
+<li><a href="#gap">What the lineage left open</a></li>
+</ol>
+</nav>
+</div>
+</section>
+
+<section id="problem">
+<div class="wrap">
+<div class="prose">
+<h2>The forecasting problem</h2>
+<p>Forecasting underpins planning in agriculture, water management, energy and
+disaster preparedness, and it is the extremes that carry the cost. The April 2022
+KwaZulu-Natal floods killed 459 people and were the most catastrophic natural
+disaster yet recorded in that province; heatwaves recur over the northern
+interior at a frequency projected to rise. Short-range forecasts matter
+regionally precisely because warning decisions rest on them.</p>
+
+<p>Operational forecasting is dominated by numerical weather prediction, which
+integrates the physics forward from an analysed initial state. Classical
+statistical approaches instead treat the problem as multivariate time-series
+prediction. Deep learning has challenged both over the past decade, but its most
+common architectures model temporal structure while neglecting the spatial
+dependencies between observation sites &mdash; and the system being forecast is
+dynamic and chaotic, with spatial and temporal dependencies that are seldom
+directly observable.</p>
+
+<p>Station-network forecasting is its own regime, distinct from the global
+reanalysis grids on which most data-driven weather models are benchmarked.
+Observations are sparse, irregularly spaced, and locally noisy. Two stations
+twenty kilometres apart can sit at different elevations, one coastal and one
+inland, and experience substantially different conditions.</p>
+</div>
+</div>
+</section>
+
+<section class="band" id="graphs">
+<div class="wrap">
+<div class="prose">
+<h2>Why a graph</h2>
+<p>A spatio-temporal graph neural network represents the station network as a
+weighted graph <em>G</em> = (<em>V</em>, <em>E</em>, <strong>A</strong>). Each of
+the <em>N</em> nodes is a weather station; edges connect stations that influence
+one another; and the weight matrix <strong>A</strong> encodes the strength of
+those dependencies. A node captures the local dynamics at one location, and the
+graph structure captures the global dynamics of the system.</p>
+
+<p>At each hour <em>t</em> the network produces an observation matrix
+<strong>X</strong><sub><em>t</em></sub> over the measured variables at every
+station. Given a window of the last <em>w</em> hours, the model maps that window
+and the graph to a joint forecast over all stations for the next <em>H</em>
+hours. In this project <em>w</em> = 12 and <em>H</em> = 48.</p>
+
+<p>The interesting question is where <strong>A</strong> comes from, and the
+architectures tested here divide sharply on it:</p>
+
+<ul>
+<li><strong>Learned adaptive graphs.</strong> The adjacency is computed from
+trainable node embeddings and optimised end to end with the forecasting
+objective. The model discovers which stations inform which, with no geographic
+prior at all.</li>
+<li><strong>Geometric graphs.</strong> The adjacency is constructed from station
+coordinates &mdash; a distance kernel, or a nearest-neighbour neighbourhood on
+the sphere. The prior is that nearby stations are related.</li>
+</ul>
+
+<p>Neither is obviously right for this network. Geographic proximity is real
+physics, but it does not capture elevation, coastal exposure or local topography,
+all of which can make close stations behave differently. This tension recurs in
+every workstream's results.</p>
+</div>
+</div>
+</section>
+
+<section id="anatomy">
+<div class="wrap">
+<div class="prose">
+<h2>Anatomy of an STGNN</h2>
+<p>Every STGNN combines a <strong>spatial module</strong> and a
+<strong>temporal module</strong>; architectures differ mainly in what those
+modules are and how they are interleaved.</p>
+
+<h3>Spatial module</h3>
+<p>Most commonly a graph convolution, which aggregates information from a node's
+neighbours according to the adjacency matrix, propagating information through the
+graph. Variants include graph attention, which learns distinct weights per
+neighbour; diffusion graph convolution, which models propagation through directed
+graphs; and specialised convolutions designed for particular spatial structures,
+such as CLCRN's convolution over the Earth's surface.</p>
+
+<h3>Temporal module</h3>
+<p>Usually a recurrent network, a temporal convolutional network, or attention.
+Gated recurrent units are popular because their gating controls what is retained
+over time at a lower parameter cost than other recurrent variants. Temporal
+convolutions, particularly dilated ones, widen the temporal receptive field
+without processing each step sequentially.</p>
+
+<p>A further axis separates how the multi-step forecast is produced.
+<strong>Direct</strong> models emit all 48 steps in one shot.
+<strong>Autoregressive</strong> models decode one step at a time, feeding each
+prediction back as input &mdash; which avoids nothing at long lead, because
+errors accumulate. CLCRN decodes autoregressively while the other models tested
+here are direct, an uncontrolled difference inherited from the original
+architectures that plausibly disadvantages CLCRN as the horizon grows.</p>
+</div>
+</div>
+</section>
+
+<section class="band" id="baselines">
+<div class="wrap">
+<h2>The two shared baselines</h2>
+<div class="prose">
+<p>Both baselines come directly from the previous study on this data, where they
+were the two strongest models. Every workstream measures against them.</p>
+</div>
+
+<div class="grid two" style="margin-top:1.5rem">
+<article class="card">
+<p><span class="tag base">Baseline</span> <span class="tag">Learned graph</span> <span class="tag">Discrete time</span></p>
+<h3>AGCRN</h3>
+<p class="who">Adaptive Graph Convolutional Recurrent Network &mdash; Bai et al., 2020</p>
+<p>A GRU whose linear mappings are replaced by graph convolutions, contributing
+two modules. <strong>Node Adaptive Parameter Learning</strong> factorises the
+convolution weights into a small per-node embedding times a shared weight pool,
+giving every station node-specific parameters without the parameter count
+scaling with network size. <strong>Data Adaptive Graph Generation</strong>
+removes the need for a predefined graph entirely: the adjacency is the normalised
+similarity of learnable node embeddings, trained end to end with the forecasting
+objective.</p>
+<p>Developed and evaluated on traffic benchmarks; transferred to South African
+weather data in 2023, where it was the best overall performer.</p>
+</article>
+
+<article class="card">
+<p><span class="tag base">Baseline</span> <span class="tag">Geometric graph</span> <span class="tag">Discrete time</span></p>
+<h3>CLCRN</h3>
+<p class="who">Conditional Local Convolution Recurrent Network &mdash; Lin et al., 2022</p>
+<p>The only one of the eight models designed for meteorology. Its
+<strong>conditional local convolution</strong> builds a <em>k</em>-nearest-neighbour
+neighbourhood around each station on the sphere and generates the kernel weights
+as a smooth learned function of each neighbour's local displacement &mdash;
+geodesic distance and orientation &mdash; so the convolution is anisotropic and
+location-aware, approximating a continuous kernel over the Earth's surface. The
+convolution sits inside a recurrent encoder&ndash;decoder that decodes the
+forecast autoregressively.</p>
+<p>Evaluated on WeatherBench reanalysis fields and transferred to SAWS stations
+in 2023. Its authors name training instability as an open problem of the method
+&mdash; a caution this project saw borne out once in 190 runs.</p>
+</article>
+</div>
+</div>
+</section>
+
+<section id="families">
+<div class="wrap">
+<h2>The three families we tested</h2>
+<div class="prose">
+<p>Each family answers a different question about what an STGNN could be doing
+differently.</p>
+</div>
+
+<div class="grid three" style="margin-top:1.5rem">
+<article class="card work ct">
+<p><span class="tag ct">Continuous-time</span></p>
+<h3>Neural ODE graph models</h3>
+<p class="models">MTGODE &middot; STGODE</p>
+<p>Neural ordinary differential equations replace a stack of residual layers with
+a vector field: the hidden state is the solution of an initial-value problem
+computed by a numerical solver, so depth becomes integration time and the latent
+trajectory is continuous rather than a sequence of discrete jumps. On graphs this
+permits deep spatial propagation without the over-smoothing that degrades stacked
+graph convolutions.</p>
+<p><strong>STGODE</strong> prescribes two static graphs &mdash; a distance kernel
+and a semantic graph that links stations with similar history shapes regardless
+of location &mdash; and propagates through a tensor-valued ODE, but its temporal
+aggregation stays discrete. <strong>MTGODE</strong> learns its graph from node
+embeddings and makes temporal aggregation an ODE too, with spatial propagation
+nested as a second ODE inside each temporal solver step.</p>
+<p class="more"><a href="continuous-time.html">Results &rarr;</a></p>
+</article>
+
+<article class="card work diff">
+<p><span class="tag diff">Diffusion-based</span></p>
+<h3>Denoising diffusion models</h3>
+<p class="models">DiffSTG &middot; USTD</p>
+<p>Conventional STGNNs emit a single point prediction and so cannot express
+uncertainty. Diffusion models define a forward process that progressively adds
+noise to the observed future until it approaches pure noise, then learn the
+reverse process. At forecast time they start from random noise and iteratively
+denoise, conditioned on the observed history &mdash; repeating this yields
+multiple plausible future trajectories.</p>
+<p><strong>DiffSTG</strong> pairs the diffusion process with a UGnet denoiser
+over a predefined graph. <strong>USTD</strong> puts a deterministic
+spatio-temporal encoder in front, so the diffusion transformer denoises a
+representation that has already captured conditional structure, and conditions
+additionally on time of day, day of year and station height.</p>
+<p class="more"><a href="diffusion.html">Results &rarr;</a></p>
+</article>
+
+<article class="card work light">
+<p><span class="tag light">Lightweight</span></p>
+<h3>Parameter-efficient models</h3>
+<p class="models">STLGRU &middot; LiteSTGNN</p>
+<p>Accuracy reported in the literature is usually bought with parameters, and the
+parameter budget is rarely treated as a variable of interest. This workstream
+asks the inverse question: how much accuracy survives a hard cut to model size,
+and at what point does additional capacity stop paying for itself?</p>
+<p>The answer matters operationally. A model cheap enough to retrain often, or to
+run where compute is scarce, may be worth more than a marginally more accurate
+model that is not.</p>
+<p class="more"><a href="lightweight.html">Results &rarr;</a></p>
+</article>
+</div>
+</div>
+</section>
+
+<section class="band" id="lineage">
+<div class="wrap">
+<h2>The South African lineage</h2>
+<div class="prose">
+<p>This is the third study in a line of work on STGNNs for South African station
+weather, and its design is shaped throughout by the two that came before. Each
+inherited data conventions, filtering criteria and hyperparameter settings from
+its predecessor, so the three are directly comparable in a way that independent
+studies usually are not.</p>
+</div>
+
+<div class="table-scroll">
+<table>
+<caption><b>Three studies, one data regime.</b> Each study extends the previous
+one in stations, models, or horizon.</caption>
+<thead>
+<tr><th scope="col">Study</th><th scope="col">Stations</th><th scope="col">Models evaluated</th><th scope="col">Horizon</th><th scope="col">Repeats</th></tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row">Davidson &amp; Moodley, 2022</th>
+<td>21</td>
+<td>Graph WaveNet, low-rank WGN, LSTM, TCN</td>
+<td>24 h</td>
+<td>10+ runs, walk-forward</td>
+</tr>
+<tr>
+<th scope="row">Gaibie et al., 2023</th>
+<td>45</td>
+<td>AGCRN, CLCRN, Graph WaveNet, TCN</td>
+<td>24 h</td>
+<td>3 runs, single hold-out</td>
+</tr>
+<tr>
+<th scope="row">WeatherFLOW, 2026</th>
+<td>32</td>
+<td>AGCRN, CLCRN + MTGODE, STGODE, DiffSTG, USTD, STLGRU, LiteSTGNN</td>
+<td>48 h</td>
+<td>3&ndash;10 runs by workstream</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="prose">
+<h3>Davidson &amp; Moodley (2022)</h3>
+<p>Established STGNN viability on South African station data, evaluating Graph
+WaveNet and a low-rank weighted graph network against LSTM and TCN baselines for
+maximum-temperature prediction at 21 stations. Graph WaveNet proved the most
+accurate, stable and robust model under walk-forward validation. The study also
+introduced the practice of analysing the dependency structures the trained models
+learn, and argued that a configuration should be judged partly on the deviation
+of its test loss across runs &mdash; a standard this project adopts.</p>
+
+<h3>Gaibie et al. (2023)</h3>
+<p>Extended the benchmark to AGCRN and CLCRN at 45 stations, predicting
+temperature, pressure, humidity and wind speed to 24 hours. Both newer models
+outperformed Graph WaveNet, with AGCRN achieving the best overall performance.
+This study contributed the hyperparameter optimisation protocol and the baseline
+optima that WeatherFLOW inherits directly. It was itself a UCT honours project,
+and its website is in the same departmental archive as this one.</p>
+
+<h3>WeatherFLOW (2026)</h3>
+<p>Doubles the horizon to 48 hours, adds three families of architecture that the
+lineage had not evaluated, raises the repeat count, and makes extreme weather an
+explicit prediction target rather than an unexamined part of the average.</p>
+
+<p class="note" style="display:block"><strong>External link.</strong> The 2023
+project website is archived at
+<a href="https://projects.cs.uct.ac.za/honsproj/">projects.cs.uct.ac.za/honsproj/</a>
+under 2023, "WEAHTER-FLOW". This is a non-permanent external link to the
+departmental archive and is not part of this website.</p>
+</div>
+</div>
+</section>
+
+<section id="gap">
+<div class="wrap">
+<div class="prose">
+<h2>What the lineage left open</h2>
+<p>Three limits are shared by both prior studies, and each one became a design
+decision here.</p>
+
+<ol>
+<li><strong>Every model evaluated was discrete-time.</strong> No continuous-time
+or generative formulation had been tested on this data, and no continuous-time
+graph model had been evaluated on an irregular meteorological station network
+anywhere.</li>
+<li><strong>Evaluation stopped at 24 hours.</strong> Whether a ranking
+established at 24 hours survives to 48 was simply unknown &mdash; and it largely
+does not, because the architectures converge.</li>
+<li><strong>Extreme weather was not a prediction target.</strong> Reported errors
+are averages over all hours, which say nothing about the hours that matter most
+for warning decisions. Symmetric training losses systematically underestimate the
+tails, so good average accuracy can coexist with poor extreme-event skill.</li>
+</ol>
+
+<p>A fourth limit is methodological rather than scientific: the more extensive of
+the two benchmarks rested on the weaker protocol, averaging three runs on a
+single hold-out where the earlier study reported over ten runs under walk-forward
+resampling. Rankings drawn from few runs can be artefacts of initialisation, and
+this project found exactly that &mdash; one run in 190 failed outright, and had
+it landed in a three-run budget it would have been a third of that cell.</p>
+
+<div class="next-prev">
+<span><a href="index.html">&larr; Overview</a></span>
+<span><a href="results.html">Results &rarr;</a></span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="site-footer">
+<div class="wrap">
+<div class="cols">
+<div>
+<h2>Project</h2>
+<ul>
+<li><a href="index.html">Overview</a></li>
+<li><a href="background.html">Background</a></li>
+<li><a href="results.html">Results</a></li>
+<li><a href="resources.html">Resources</a></li>
+</ul>
+</div>
+<div>
+<h2>Workstreams</h2>
+<ul>
+<li><a href="continuous-time.html">Continuous-time &mdash; Jaravani</a></li>
+<li><a href="diffusion.html">Diffusion-based &mdash; Chikwanha</a></li>
+<li><a href="lightweight.html">Lightweight &mdash; Fuyana</a></li>
+</ul>
+</div>
+<div>
+<h2>Key documents</h2>
+<ul>
+<li><a href="assets/docs/weatherflow-poster.pdf">Project poster (PDF)</a></li>
+<li><a href="assets/docs/final-paper-jaravani.pdf">Final paper &mdash; Jaravani (PDF)</a></li>
+<li><a href="assets/docs/final-paper-chikwanha.pdf">Final paper &mdash; Chikwanha (PDF)</a></li>
+</ul>
+</div>
+<div>
+<h2>Department</h2>
+<ul>
+<li>Department of Computer Science</li>
+<li>University of Cape Town</li>
+<li>Supervisor: A/Prof Deshendran Moodley</li>
+</ul>
+</div>
+</div>
+<div class="colophon">
+<p>WeatherFLOW &mdash; CSC4002W honours project, Department of Computer Science,
+University of Cape Town, 2026.</p>
+<p>Station observations supplied by the South African Weather Service and used
+under their data policy. Computation on the UCT ICTS High-Performance Computing
+cluster. This work is based on research supported in part by the National
+Research Foundation of South Africa (ref. PMDS251030376307).</p>
+</div>
+</div>
+</footer>
+</body>
+</html>

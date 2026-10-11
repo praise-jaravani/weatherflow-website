@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Continuous-time STGNNs — WeatherFLOW</title>
+<meta name="description" content="Praise Jaravani — neural-ODE graph models (MTGODE, STGODE) for normal and extreme weather prediction on South African station data.">
+<meta name="author" content="Génevieve Chikwanha, Zoleka Fuyana, Praise Jaravani">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<div class="wrap">
+<a class="brand" href="index.html"><svg class="mark" viewBox="0 0 24 24" width="19" height="19" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="7" r="1.9"/><circle cx="18" cy="5.5" r="1.9"/><circle cx="12" cy="13" r="1.9"/><circle cx="19" cy="17.5" r="1.9"/><circle cx="5.5" cy="18" r="1.9"/><path d="M6.6 8.2 10.6 11.8M16.2 6.4 13.2 11.3M13.5 14.2 17.2 16.4M10.4 14.2 6.8 16.6M6.9 7.3h9.3"/></svg><span>WeatherFLOW</span> <span class="sub">UCT&nbsp;Honours&nbsp;2026</span></a>
+<nav class="site-nav" aria-label="Main">
+<ul>
+<li><a href="index.html">Overview</a></li>
+<li><a href="background.html">Background</a></li>
+<li><a href="results.html">Results</a></li>
+<li><a href="continuous-time.html" aria-current="page">Continuous-time</a></li>
+<li><a href="diffusion.html">Diffusion</a></li>
+<li><a href="lightweight.html">Lightweight</a></li>
+<li><a href="resources.html">Resources</a></li>
+</ul>
+</nav>
+</div>
+</header>
+<main id="main">
+<section class="page-head">
+<div class="wrap">
+<p class="eyebrow"><span class="tag ct">Workstream 1</span> Individual contribution</p>
+<h1>Continuous-time STGNNs for normal and extreme weather</h1>
+<p class="tagline">Praise Jaravani &mdash; crossing the spatial prior with the
+temporal formulation, and asking whether average accuracy says anything about
+accuracy on extremes.</p>
+
+<ul class="pill-row" style="margin-top:1.6rem">
+<li><a class="pill primary" href="assets/docs/final-paper-jaravani.pdf">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5"/></svg>
+Final paper (PDF)</a></li>
+<li><a class="pill" href="results.html#ct">Results in context</a></li>
+<li><a class="pill" href="resources.html#code">Source code</a></li>
+</ul>
+
+<nav class="toc" aria-label="On this page">
+<p>On this page</p>
+<ol>
+<li><a href="#question">Research question</a></li>
+<li><a href="#design">The 2&times;2 design</a></li>
+<li><a href="#method">Method</a></li>
+<li><a href="#findings">Findings</a></li>
+<li><a href="#stability">Seed stability and the divergent run</a></li>
+<li><a href="#casestudy">Case study: December 2024 heatwave</a></li>
+<li><a href="#discussion">Discussion</a></li>
+<li><a href="#limits">Limitations and future work</a></li>
+<li><a href="#docs">Documents</a></li>
+</ol>
+</nav>
+</div>
+</section>
+
+<section id="question">
+<div class="wrap">
+<div class="prose">
+<h2>Research question</h2>
+<p>Spatio-temporal graph neural networks achieve strong average-case accuracy for
+station-level weather forecasting. Two things stayed untested: their behaviour on
+the extreme events that symmetric training losses smooth away, and how far ahead
+their forecasts remain skillful.</p>
+
+<p>This workstream benchmarks <strong>MTGODE</strong> &mdash; a continuous-time
+neural-ODE STGNN and, to the best of our knowledge, the first applied to weather
+forecasting &mdash; against STGODE, AGCRN and CLCRN, crossing the spatial prior
+(learned versus geometric) with the temporal formulation (discrete versus
+continuous) in a 2&times;2 design over 32 SAWS stations. Evaluation spans 48-hour
+regression stratified by extremes, and extreme-event detection under calendar-
+and hour-relative percentile labels.</p>
+
+<h3>Contributions</h3>
+<ol>
+<li>The first application of MTGODE &mdash; and of learned-adaptive-graph neural
+ODEs generally &mdash; to meteorological forecasting, on an irregular station
+network.</li>
+<li>A 2&times;2 comparison of spatial prior against temporal formulation on South
+African station data under a single pipeline, extending the
+Davidson&ndash;Gaibie lineage to 48-hour horizons.</li>
+<li>An extreme-event detection formulation that extends ETCCDI percentile indices
+to hourly resolution through calendar- and hour-relative thresholds, with
+pre-registered naive baselines and decision rules, removing by construction the
+calendar signal that static thresholds concede to any climatology-aware
+classifier.</li>
+<li>WeatherFLOW, a reproducible benchmarking framework integrating four STGNN
+families under a single training and evaluation harness, with
+implementation-fidelity audits reported.</li>
+</ol>
+</div>
+</div>
+</section>
+
+<section class="band" id="design">
+<div class="wrap">
+<h2>The 2&times;2 design</h2>
+<div class="prose">
+<p>The four architectures were not chosen for coverage. They instantiate every
+combination of the two properties that distinguish them, so that each axis can
+be read against the other rather than confounded with it.</p>
+</div>
+
+<div class="table-scroll">
+<table>
+<caption><b>The experimental design.</b> Rows are the spatial prior; columns are
+the temporal formulation.</caption>
+<thead>
+<tr><th scope="col">Spatial prior \ Temporal</th><th scope="col">Discrete time</th><th scope="col">Continuous time (neural ODE)</th></tr>
+</thead>
+<tbody>
+<tr><th scope="row">Learned adaptive graph</th><td>AGCRN</td><td>MTGODE</td></tr>
+<tr><th scope="row">Geometric graph</th><td>CLCRN</td><td>STGODE</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="prose">
+<p>Holding everything outside those two axes fixed &mdash; same tensors, same
+splits, same loss, same optimiser, same seeds, same evaluation &mdash; means a
+difference between cells is attributable to the design, and the
+<em>interaction</em> between the axes becomes measurable rather than assumed.
+That interaction turned out to be the main result.</p>
+</div>
+</div>
+</section>
+
+<section id="method">
+<div class="wrap">
+<h2>Method</h2>
+<div class="prose">
+<h3>Two tasks</h3>
+<p><strong>Phase 1</strong> is deterministic multi-step regression: a 12-hour
+input window maps to a joint 48-hour forecast over all stations, reported at six
+sub-horizons by truncation of the direct forecast. Targets are temperature,
+surface pressure, relative humidity and wind speed; all six recorded variables
+are available as input.</p>
+
+<p><strong>Phase 2</strong> is extreme-event detection. The ground truth is
+whether an observation exceeds a threshold conditioned on station, variable,
+day-of-year and hour-of-day &mdash; the 95th percentile of training observations
+pooled over a &plusmn;7-day, &plusmn;1-hour window that wraps at year and day
+boundaries. This extends the ETCCDI moving-calendar-window convention to hourly
+resolution, with the day window widened from five days to seven so that a
+six-year baseline clears the roughly 200 samples a stable 95th-percentile
+estimate needs.</p>
+
+<p>Each model's output is mapped to one logit per station, horizon step and label
+variable, and trained as a multi-label classifier with weighted binary
+cross-entropy. Training positive rates are 4&ndash;5% for temperature, humidity
+and wind speed but about 0.28% for precipitation, giving a precipitation weight
+near 350. STGODE sits out Phase 2 &mdash; its univariate output head is
+incompatible with the multi-label path.</p>
+
+<dl class="kv" style="margin:1.75rem 0">
+<dt>Campaign</dt><dd>4 models &times; 4 targets &times; 10 seeds = 160 regression runs; 3 models &times; 10 seeds = 30 detection runs; <strong>190 runs total</strong></dd>
+<dt>Seeds</dt><dd>{42&hellip;51}, with full seeding of Python, NumPy and PyTorch</dd>
+<dt>Input window</dt><dd>12 hours</dd>
+<dt>Horizon</dt><dd>48 hours, reported at 3, 6, 9, 12, 24, 48</dd>
+<dt>Loss</dt><dd>mean absolute error; Adam; per-paper learning-rate schedules; gradients clipped at 5.0; early stopping patience 15</dd>
+<dt>Hardware</dt><dd>NVIDIA L40S, UCT ICTS HPC</dd>
+</dl>
+
+<h3>Why the labels are calendar-relative</h3>
+<p>A fixed per-station percentile absorbs a variable's annual cycle, so a
+classifier told nothing but the calendar-hour exceedance frequency can score far
+above chance. Measured directly: under static thresholds such a classifier
+reaches 5.98&times; prevalence on temperature. Under the calendar- and
+hour-relative scheme it falls to no skill on three variables (0.87 to 0.93) and
+only just above on precipitation. The labels therefore concede no calendar
+signal, and the detection results are not an artefact of seasonality.</p>
+
+<h3>Running the authors' code</h3>
+<p>Upstream repositories are vendored at pinned commits and never modified; each
+integration is an adapter wrapping the published code behind a common interface.
+An external implementation audit of the MTGODE integration preceded all reported
+runs and found three defects, each corrected before relaunch: the adjoint
+backward pass structurally excluded the graph learner's parameters from gradient
+flow, so the learned adjacency stayed at its random initialisation; the
+graph-learner embedding dimension had been conflated with the convolutional
+width; and the spatial vector field was implemented at half the required
+magnitude. No result produced before these corrections is reported.</p>
+
+<p>One inherited hyperparameter also needed repair. The 2023 study's AGCRN
+learning rate of 0.01 exceeds the ceiling of the original authors' published
+search range and diverged on this network, with best validation at epoch 1. A
+pre-registered single-seed diagnostic selected the original published optimum of
+0.003, a 42% reduction in validation MAE.</p>
+</div>
+</div>
+</section>
+
+<section class="band" id="findings">
+<div class="wrap">
+<h2>Findings</h2>
+<div class="prose-wide">
+
+<div class="finding">
+<p class="eyebrow">Result 1 &middot; Continuous time transfers, conditionally</p>
+<p>MTGODE attains the lowest error on three of four variables and is inseparable
+from CLCRN on surface pressure &mdash; the first demonstration that a
+continuous-time graph model works on an irregular station network. But STGODE is
+continuous-time too and is the weakest of the four, so continuity alone does not
+carry the result.</p>
+</div>
+
+<div class="finding">
+<p class="eyebrow">Result 2 &middot; Neither design axis helps alone</p>
+<p>The interaction dominates. Moving from discrete to continuous time lowers
+error under a learned adaptive graph and raises it under a geometric prior
+&mdash; the lines cross on every variable. The interaction is negative on all
+four, from &minus;3.28% to &minus;5.19% of the four-cell mean, and exceeds either
+marginal effect. The pattern is diagonal rather than marginal: the cells pairing
+a learned graph with continuous time, and a geometric prior with discrete
+recurrence, both fall below each variable's mean, while the two crossed pairings
+fall above it.</p>
+</div>
+
+<div class="finding">
+<p class="eyebrow">Result 3 &middot; All four models smooth the tails</p>
+<p>Error degrades by up to a factor of 3.5 on extreme hours, and the model most
+accurate on average is not the model most accurate on extremes. On temperature,
+AGCRN attains the lower extreme-regime MAE in 90% of cross-pairs against MTGODE
+and 93% against STGODE. Mean error is the wrong criterion for selecting an
+extreme-event forecaster.</p>
+</div>
+
+<div class="finding">
+<p class="eyebrow">Result 4 &middot; Accuracy is not bought with scale</p>
+<p>The most accurate model is also among the cheapest, at 138,096 parameters
+against 1,663,104 for the weakest. CLCRN, the smallest of the four, separates
+from the far larger STGODE on all four variables. Parameter count and inference
+speed do not track one another either.</p>
+</div>
+
+</div>
+
+<figure>
+<img src="assets/img/figures/jaravani-fig3.png" width="842" height="768"
+  alt="Four small charts, one per variable, each plotting MAE relative to the best cell for all-hours against extreme-hours, with one marker per model. Degradation factors are 1.79 to 2.02 for temperature, 1.97 to 2.24 for pressure, 0.98 to 1.02 for humidity and 3.35 to 3.49 for wind speed.">
+<figcaption><b>Extreme-hour against all-hour error.</b> The ordering of the
+models changes between the two regimes on three of four variables. Humidity is
+the exception: its upper tail is a bounded saturation region, so error does not
+grow there. Plotted on the interquartile mean, so CLCRN's temperature point is
+not inflated by the divergent run.
+<span class="src">Figure 3, Jaravani (2026).</span></figcaption>
+</figure>
+
+<h3>Forecast validity</h3>
+<div class="prose">
+<p>The valid forecast horizon is the last lead at which pooled NRMSE stays at or
+below a threshold &epsilon;, with all NRMSE normalised by the frozen training-split
+standard deviation so that &epsilon;&nbsp;=&nbsp;1.0 marks climatology-equivalent
+error.</p>
+</div>
+
+<div class="table-scroll">
+<table>
+<caption><b>Valid forecast horizon (hours)</b>, mean over ten seeds, at two
+thresholds. At the pre-registered &epsilon;&nbsp;=&nbsp;0.3, eight of sixteen
+cells sit at zero because first-lead NRMSE already exceeds the threshold.</caption>
+<thead>
+<tr><th scope="col">Model</th>
+<th scope="col" colspan="4">&epsilon; = 0.3</th>
+<th scope="col" colspan="4">&epsilon; = 0.5</th></tr>
+<tr><th scope="col">&nbsp;</th>
+<th scope="col">t2m</th><th scope="col">sp</th><th scope="col">rh</th><th scope="col">ws</th>
+<th scope="col">t2m</th><th scope="col">sp</th><th scope="col">rh</th><th scope="col">ws</th></tr>
+</thead>
+<tbody>
+<tr><th scope="row">AGCRN</th><td>2.0</td><td>0</td><td>1.0</td><td>0</td><td>26.2</td><td>0</td><td>5.2</td><td>0.9</td></tr>
+<tr><th scope="row">CLCRN</th><td>2.6</td><td>0</td><td>1.0</td><td>0</td><td>25.6</td><td>0</td><td>6.6</td><td>1.0</td></tr>
+<tr><th scope="row">MTGODE</th><td class="best">3.0</td><td>0</td><td>1.0</td><td>0</td><td class="best">29.2</td><td class="best">2.6</td><td class="best">7.0</td><td>1.0</td></tr>
+<tr><th scope="row">STGODE</th><td>1.9</td><td>0</td><td>1.0</td><td>0</td><td>25.1</td><td>0.4</td><td>4.7</td><td>1.0</td></tr>
+<tr class="baseline"><th scope="row">Persistence</th><td>1</td><td>0</td><td>0</td><td>0</td><td>2</td><td>3</td><td>1</td><td>1</td></tr>
+<tr class="baseline"><th scope="row">Climatology</th><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="prose">
+<p>At the looser threshold the horizon recovers the mean-error ordering on
+temperature and humidity but not on pressure, where CLCRN reaches zero hours yet
+ties for lowest MAE, and persistence outlasts every model. The pre-registered
+threshold is too strict to arbitrate between the architectures on this data
+&mdash; a reportable negative result rather than a tuning opportunity.</p>
+</div>
+</div>
+</section>
+
+<section id="stability">
+<div class="wrap">
+<h2>Seed stability and the divergent run</h2>
+<div class="prose">
+<p>Fifteen of the sixteen (model, target) regression cells are stable under
+reinitialisation, with coefficients of variation of test MAE from 0.18% to 3.02%.
+Surface pressure carries the highest variation for every model; wind speed, where
+the signal is strongest, converges to nearly the same error across runs.</p>
+
+<p>The sixteenth cell is the exception, and it is reported as a finding rather
+than cleaned away. On temperature, CLCRN's seed 50 converged to the training
+mean: its validation loss never fell below its first-epoch value and its test
+error equals the climatological forecast's &mdash; 5.003 against
+5.005&nbsp;&deg;C. The failure reproduced under the same seed. It is one run in
+190 and it is <strong>retained in every reported statistic</strong>.</p>
+
+<p>Its effect is the reliability result. It inflates that cell's standard
+deviation to &plusmn;0.912 against &plusmn;0.013 to 0.029 elsewhere, and lifts
+the cell mean by 0.29&nbsp;&deg;C &mdash; about twice the widest gap between
+converged architectures (0.148&nbsp;&deg;C). It struck the strongest-signal
+variable. Under the previous study's three-run budget it would have been a third
+of a cell, and it flips the sign of the mean-based temperature interaction, which
+is why the factorial analysis rests on the interquartile mean rather than the raw
+mean. That the failed run is a CLCRN run is consistent with CLCRN's authors
+naming training instability an open problem of the method, though one run cannot
+establish a rate.</p>
+</div>
+
+<div class="table-scroll">
+<table>
+<caption><b>Probability that a random run of the first model attains lower test
+MAE than a random run of the second</b>, estimated over all 10&times;10
+cross-pairs with 95% percentile-bootstrap intervals. Bold marks intervals
+excluding 0.5. Twenty-two of twenty-four comparisons separate.</caption>
+<thead>
+<tr><th scope="col">Comparison</th><th scope="col">t2m</th><th scope="col">sp</th><th scope="col">rh</th><th scope="col">ws</th></tr>
+</thead>
+<tbody>
+<tr><th scope="row">MTGODE &gt; CLCRN</th><td>.69 [.43,&nbsp;.91]</td><td>.56 [.28,&nbsp;.83]</td><td class="best">.82 [.61,&nbsp;.97]</td><td class="best">.99 [.94,&nbsp;1.0]</td></tr>
+<tr><th scope="row">MTGODE &gt; AGCRN</th><td class="best">1.0 [1.0,&nbsp;1.0]</td><td class="best">1.0 [1.0,&nbsp;1.0]</td><td class="best">1.0 [1.0,&nbsp;1.0]</td><td class="best">1.0 [1.0,&nbsp;1.0]</td></tr>
+<tr><th scope="row">MTGODE &gt; STGODE</th><td class="best">1.0 [1.0,&nbsp;1.0]</td><td class="best">.93 [.80,&nbsp;1.0]</td><td class="best">1.0 [1.0,&nbsp;1.0]</td><td class="best">1.0 [1.0,&nbsp;1.0]</td></tr>
+<tr><th scope="row">CLCRN &gt; AGCRN</th><td class="best">.88 [.67,&nbsp;1.0]</td><td class="best">.98 [.91,&nbsp;1.0]</td><td class="best">1.0 [1.0,&nbsp;1.0]</td><td class="best">1.0 [1.0,&nbsp;1.0]</td></tr>
+<tr><th scope="row">CLCRN &gt; STGODE</th><td class="best">.90 [.70,&nbsp;1.0]</td><td class="best">.83 [.63,&nbsp;.97]</td><td class="best">1.0 [1.0,&nbsp;1.0]</td><td class="best">1.0 [1.0,&nbsp;1.0]</td></tr>
+<tr><th scope="row">AGCRN &gt; STGODE</th><td class="best">1.0 [1.0,&nbsp;1.0]</td><td>.20 [.04,&nbsp;.42]</td><td class="best">1.0 [1.0,&nbsp;1.0]</td><td class="best">.87 [.65,&nbsp;1.0]</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="prose">
+<p>Across the 40 (target, seed) cells MTGODE takes first place in 31 and CLCRN in
+the other 9; no other model leads anywhere. The bottom of the ranking is
+reproducible and the top is not on temperature and pressure.</p>
+</div>
+
+<figure>
+<img src="assets/img/figures/jaravani-fig7.png" width="1722" height="651"
+  alt="Left: scatter of all 190 runs' MAE relative to the best cell, grouped by variable and model, with the divergent CLCRN temperature run marked as an outlier at 2.37. Right: horizontal bars of the probability that one model beats another, by target, with 95% confidence intervals.">
+<figcaption><b>Every run, and every pairwise comparison.</b> Left: all 190 runs,
+one point per seed, with the divergent CLCRN temperature run marked. Right: the
+probability that a randomly drawn run of one model beats another, by target,
+with 95% intervals.
+<span class="src">Figure 7, Jaravani (2026).</span></figcaption>
+</figure>
+
+<h3>Where the hard stations are</h3>
+<div class="prose">
+<p>Station difficulty is a property of the sites, not the architectures: the four
+models rank the 32 stations near-identically, with per-station error correlations
+of 0.98 to 1.00 on every variable. The coastal&ndash;inland contrast reverses by
+variable &mdash; temperature and relative humidity are forecast more accurately
+at the coast, wind speed and surface pressure less so &mdash; and all four
+differences are significant.</p>
+</div>
+
+<figure>
+<img src="assets/img/figures/jaravani-fig8.png" width="2020" height="1431"
+  alt="Four maps of the eastern half of South Africa, one per variable, with each of the 32 stations drawn as a marker coloured by that station's test MAE. Coastal and inland medians and a Mann-Whitney p-value are given for each.">
+<figcaption><b>Per-station test MAE.</b> Temperature 1.54 &deg;C coastal against
+2.30 &deg;C inland (<i>p</i>&nbsp;&lt;&nbsp;0.001); surface pressure 4.23 against
+2.80 hPa (<i>p</i>&nbsp;=&nbsp;0.004); relative humidity 8.20% against 9.80%
+(<i>p</i>&nbsp;&lt;&nbsp;0.001); wind speed 1.38 against 1.02 m&nbsp;s<sup>&minus;1</sup>
+(<i>p</i>&nbsp;=&nbsp;0.037).
+<span class="src">Figure 8, Jaravani (2026).</span></figcaption>
+</figure>
+</div>
+</section>
+
+<section class="band" id="casestudy">
+<div class="wrap">
+<h2>Case study: the December 2024 heatwave</h2>
+<div class="prose">
+<p>The aggregate extreme results are reproduced on a single named event at
+Makatini station, at 24-hour lead. The case study shows the mechanism directly:
+each model follows the diurnal shape of the event but flattens its amplitude, so
+error concentrates exactly where the observation is most extreme. Detection
+recall collapses as lead grows.</p>
+<p>This is the double-penalty behaviour of a smooth predictor under a
+squared-error objective, compounded by the scarcity of tail samples that leaves
+the high quantiles under-fit. The deficit sits in the training objective, not in
+the architecture.</p>
+</div>
+
+<figure>
+<img src="assets/img/figures/jaravani-fig6.png" width="842" height="813"
+  alt="Two stacked panels for the December 2024 heatwave at Makatini station at 24-hour lead. The top panel shows observed temperature against each model's forecast, with a shaded band marking the calendar- and hour-relative exceedance threshold; the models track the daily cycle but under-shoot the peaks.">
+<figcaption><b>The December 2024 heatwave at Makatini</b>, at 24-hour lead. The
+shaded band is the calendar- and hour-relative exceedance region in operation
+&mdash; it tracks the hour and the calendar rather than sitting at a fixed line.
+<span class="src">Figure 6, Jaravani (2026).</span></figcaption>
+</figure>
+</div>
+</section>
+
+<section id="discussion">
+<div class="wrap">
+<div class="prose">
+<h2>Discussion</h2>
+
+<h3>Continuous-time formulations work when the graph is learned</h3>
+<p>A claim about either design axis is conditional on the other. This is
+consistent with the MTGODE authors' positioning of their model against STGODE on
+continuous temporal aggregation, without isolating it &mdash; STGODE's cell also
+differs in spatial prior, takes a single Euler step, and won its hyperparameter
+search at the grid bound on three of five knobs, which makes its result a lower
+bound on that corner of the design rather than a tuned optimum. Where the
+MTGODE authors report their model's edge as largest at long horizons, here it is
+largest at short lead.</p>
+
+<h3>No single criterion selects one architecture</h3>
+<p>On average error, on forecast validity at the looser threshold, and on
+detection ranking, MTGODE leads. In the tail, a discrete-recurrence model has the
+lower regression error on three of four variables. Capacity buys none of it. The
+criteria fall into two families &mdash; average-case skill and tail amplitude
+&mdash; that do not agree, so the choice of model follows the intended use rather
+than a single ranking.</p>
+
+<h3>The results transfer in scale but not in order</h3>
+<p>The 2023 study ranks AGCRN ahead of CLCRN on temperature, humidity and wind
+speed from three runs without dispersion; here CLCRN separates from AGCRN on all
+four, the two studies agreeing only on pressure. Several factors are confounded
+&mdash; the eastern rather than Cape network, the inherited optima, and three
+runs against ten seeds. Pressure is the sharpest contrast: most predictable in
+the earlier study's normalised units but least predictable here in physical ones,
+because min&ndash;max normalisation over a wide altitude range shrinks pressure
+error by construction. What transfers is the size of the differences, not their
+order.</p>
+
+<h3>Static exceedance thresholds are not comparable across variables</h3>
+<p>Because a fixed per-station percentile absorbs a variable's calendar cycle, a
+seasonal classifier scores far above chance under it, and by an amount that
+differs sharply by variable &mdash; 5.98&times; prevalence on temperature against
+2.44&times; on precipitation. The calendar- and hour-relative scheme removes that
+signal, restoring no skill on three of the four variables.</p>
+</div>
+</div>
+</section>
+
+<section class="band" id="limits">
+<div class="wrap">
+<div class="prose">
+<h2>Limitations and future work</h2>
+<p>Evaluation uses a single chronological hold-out rather than walk-forward
+validation, and hyperparameter selection is asymmetric &mdash; inherited optima
+for the baselines, an Optuna search for the continuous-time models. The network
+is confined to the summer-rainfall east. The extreme-event picture is narrower
+still: it rests on one named event, on single-hour labels with no duration
+structure, and on a non-stationary tail that a frozen decision threshold cannot
+track &mdash; test positive rates run about 1.6&times; the training rate on
+temperature and 2.8&times; on humidity.</p>
+
+<p>Each limit points to a next step. A single architecture whose spatial prior
+and temporal formulation switch independently would turn the interaction into a
+controlled effect rather than one confounded with other differences between the
+cells. A tail-weighted or probabilistic objective would address the smoothing
+every model shows &mdash; the remedy is the loss, not a larger model.
+Duration-aware labels with recalibrated thresholds would suit operational use.</p>
+</div>
+</div>
+</section>
+
+<section id="docs">
+<div class="wrap">
+<h2>Documents</h2>
+<ul class="doclist">
+<li><a href="assets/docs/final-paper-jaravani.pdf">
+  <span class="t">Final paper</span>
+  <span class="d">Continuous-Time and Discrete Spatio-Temporal Graph Neural Networks for Normal and Extreme Weather Prediction on South African Station Data</span>
+  <span class="meta">PDF</span></a></li>
+<li><span class="pending">
+  <span class="t">Literature review</span>
+  <span class="d">Individual literature review.</span>
+  <span class="meta">To be added</span></span></li>
+<li><a href="resources.html#code">
+  <span class="t">WeatherFLOW source code</span>
+  <span class="d">Benchmarking framework, model adapters, preprocessing and evaluation.</span>
+  <span class="meta">Archive</span></a></li>
+<li><a href="assets/docs/weatherflow-poster.pdf">
+  <span class="t">Project poster</span>
+  <span class="d">Joint deliverable covering all three workstreams.</span>
+  <span class="meta">PDF</span></a></li>
+</ul>
+
+<div class="next-prev">
+<span><a href="results.html">&larr; Results</a></span>
+<span><a href="diffusion.html">Diffusion workstream &rarr;</a></span>
+</div>
+</div>
+</section>
+</main>
+<footer class="site-footer">
+<div class="wrap">
+<div class="cols">
+<div>
+<h2>Project</h2>
+<ul>
+<li><a href="index.html">Overview</a></li>
+<li><a href="background.html">Background</a></li>
+<li><a href="results.html">Results</a></li>
+<li><a href="resources.html">Resources</a></li>
+</ul>
+</div>
+<div>
+<h2>Workstreams</h2>
+<ul>
+<li><a href="continuous-time.html">Continuous-time &mdash; Jaravani</a></li>
+<li><a href="diffusion.html">Diffusion-based &mdash; Chikwanha</a></li>
+<li><a href="lightweight.html">Lightweight &mdash; Fuyana</a></li>
+</ul>
+</div>
+<div>
+<h2>Key documents</h2>
+<ul>
+<li><a href="assets/docs/weatherflow-poster.pdf">Project poster (PDF)</a></li>
+<li><a href="assets/docs/final-paper-jaravani.pdf">Final paper &mdash; Jaravani (PDF)</a></li>
+<li><a href="assets/docs/final-paper-chikwanha.pdf">Final paper &mdash; Chikwanha (PDF)</a></li>
+</ul>
+</div>
+<div>
+<h2>Department</h2>
+<ul>
+<li>Department of Computer Science</li>
+<li>University of Cape Town</li>
+<li>Supervisor: A/Prof Deshendran Moodley</li>
+</ul>
+</div>
+</div>
+<div class="colophon">
+<p>WeatherFLOW &mdash; CSC4002W honours project, Department of Computer Science,
+University of Cape Town, 2026.</p>
+<p>Station observations supplied by the South African Weather Service and used
+under their data policy. Computation on the UCT ICTS High-Performance Computing
+cluster. This work is based on research supported in part by the National
+Research Foundation of South Africa (ref. PMDS251030376307).</p>
+</div>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,406 @@
+<section class="page-head">
+<div class="wrap">
+<p class="eyebrow"><span class="tag diff">Workstream 2</span> Individual contribution</p>
+<h1>Diffusion-based STGNNs for weather prediction</h1>
+<p class="tagline">Génevieve Chikwanha &mdash; whether generating a distribution
+of possible futures beats predicting a single one, and what actually separates
+two diffusion models from each other.</p>
+
+<ul class="pill-row" style="margin-top:1.6rem">
+<li><a class="pill primary" href="assets/docs/final-paper-chikwanha.pdf">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5"/></svg>
+Final paper (PDF)</a></li>
+<li><a class="pill" href="results.html#diff">Results in context</a></li>
+<li><a class="pill" href="resources.html#code">Source code</a></li>
+</ul>
+
+<nav class="toc" aria-label="On this page">
+<p>On this page</p>
+<ol>
+<li><a href="#question">Research question</a></li>
+<li><a href="#models">The two diffusion models</a></li>
+<li><a href="#method">Method</a></li>
+<li><a href="#findings">Findings</a></li>
+<li><a href="#conditioning">Why conditioning decides it</a></li>
+<li><a href="#spatial">Spatial and elevation patterns</a></li>
+<li><a href="#uncertainty">Uncertainty and CRPS</a></li>
+<li><a href="#limits">Limitations and future work</a></li>
+<li><a href="#docs">Documents</a></li>
+</ol>
+</nav>
+</div>
+</section>
+
+<section id="question">
+<div class="wrap">
+<div class="prose">
+<h2>Research question</h2>
+<p>Conventional STGNNs are deterministic: they emit one number per station per
+hour and so cannot express how uncertain that number is. Diffusion models offer
+an alternative &mdash; learn to reverse a noising process, and the forecast
+becomes a <em>sample</em> from a distribution, so repeating the process yields
+many plausible futures. The approach has shown promise on traffic and urban
+sensor data, but it was not clear whether its advantages transfer to weather
+forecasting, and particularly to an irregularly distributed station network.</p>
+
+<p>This workstream evaluates <strong>DiffSTG</strong> and <strong>USTD</strong>
+against the deterministic AGCRN and CLCRN baselines on the same 32 SAWS stations,
+scoring both point accuracy (MAE, RMSE) and distributional quality (CRPS) over
+horizons to 48 hours.</p>
+
+<h3>Contributions</h3>
+<ol>
+<li>An empirical comparison of two diffusion-based STGNNs against established
+deterministic STGNNs for weather forecasting on South African station data.</li>
+<li>Evaluation of both point and probabilistic forecasting performance across
+four weather variables and horizons to 48 hours, using MAE, RMSE and CRPS.</li>
+<li>Analysis of forecasting error across time and space &mdash; node-level
+performance and the relationship between error, station elevation and local
+weather variability.</li>
+</ol>
+</div>
+</div>
+</section>
+
+<section class="band" id="models">
+<div class="wrap">
+<h2>The two diffusion models</h2>
+<div class="prose">
+<p>Both learn to reverse a noising process; they differ in what the denoiser sees
+while doing it. That difference turns out to decide the result.</p>
+</div>
+
+<div class="grid two" style="margin-top:1.5rem">
+<article class="card">
+<p><span class="tag diff">Diffusion</span> <span class="tag">Predefined graph</span></p>
+<h3>DiffSTG</h3>
+<p class="who">Wen et al. &mdash; diffusion over spatio-temporal graphs</p>
+<p>Combines the diffusion process with a <strong>UGnet</strong> denoiser:
+temporal convolutional blocks model temporal dependency and graph convolutional
+blocks propagate between spatially connected nodes. During training the future
+target is progressively corrupted with noise while the historical observations
+condition the denoising; at inference the process runs in reverse from random
+noise. It is explicitly non-autoregressive, generating the whole horizon at once.</p>
+<p>In this implementation the history is the conditioning sequence, the same
+predefined distance-based adjacency is used throughout, and no additional
+covariates are supplied.</p>
+</article>
+
+<article class="card">
+<p><span class="tag diff">Diffusion</span> <span class="tag">Encoder + covariates</span></p>
+<h3>USTD</h3>
+<p class="who">Hu et al. &mdash; unified spatio-temporal diffusion</p>
+<p>Puts a <strong>deterministic encoder in front of the diffusion</strong>. Graph
+convolutions extract a representation of the historical spatio-temporal context,
+and a diffusion Transformer then denoises the noisy future using self-attention
+across stations and time. Spatial position enters through Laplacian positional
+encodings derived from the graph; temporal position is supplied separately.</p>
+<p>In this implementation the history and covariates pass through a Graph
+WaveNet encoder with the predefined adjacency, and the result conditions the
+Transformer alongside <strong>time of day, day of year and station
+height</strong>, supplied for both historical and future steps.</p>
+</article>
+</div>
+</div>
+</section>
+
+<section id="method">
+<div class="wrap">
+<h2>Method</h2>
+<div class="prose">
+<p>The SAWS supply covered 60 automatic weather stations across the Free State,
+Gauteng, KwaZulu-Natal and the Eastern Cape. Twenty-eight exceeded the 10%
+missingness threshold and were excluded, leaving 32 &mdash; 13 in the Eastern
+Cape, 12 in KwaZulu-Natal, 5 in the Free State and 2 in Gauteng. Remaining gaps
+were filled by inverse-distance weighting, which estimates a missing value as a
+distance-weighted average of concurrent observations at neighbouring stations.</p>
+
+<p>Four of the six recorded variables were modelled, excluding rainfall and wind
+direction. Each variable was trained <strong>separately and univariately</strong>:
+the input tensor was sliced per feature, so a model forecasting temperature sees
+only temperature history. This differs from the continuous-time workstream, which
+supplies all six variables as input while predicting one &mdash; a difference
+worth holding in mind when comparing the two sets of numbers.</p>
+
+<dl class="kv" style="margin:1.75rem 0">
+<dt>Observations</dt><dd>87,672 hourly timesteps &times; 32 stations &times; 4 features = 11,222,016 observations</dd>
+<dt>Split</dt><dd>chronological 60 / 20 / 20 &mdash; train 2016&ndash;2021, validate 2022&ndash;2023, test 2024&ndash;2025</dd>
+<dt>Normalisation</dt><dd>z-score, mean and standard deviation from the training set only</dd>
+<dt>Seeds</dt><dd>3 &mdash; 2024, 2025, 2026</dd>
+<dt>Samples</dt><dd>8 per diffusion run, averaged for comparison with the deterministic baselines</dd>
+<dt>Training</dt><dd>MAE objective, Adam; max 50 epochs for baselines, 300 for diffusion models; early stopping patience 15</dd>
+<dt>Tuning</dt><dd>Tree-structured Parzen Estimator, 30 trials of 30 epochs; first 10 trials random, remaining 20 guided</dd>
+<dt>Hardware</dt><dd>NVIDIA A100, UCT ICTS HPC</dd>
+</dl>
+
+<h3>Metrics</h3>
+<p>MAE and RMSE are reported together because they weight the error distribution
+differently &mdash; RMSE's sensitivity to large errors makes it the more
+informative of the two when the question concerns extremes. <strong>CRPS</strong>
+is added for the diffusion models: it scores the compatibility of a whole
+predictive distribution with the observation, which MAE and RMSE cannot do
+because they score only a point.</p>
+</div>
+</div>
+</section>
+
+<section class="band" id="findings">
+<div class="wrap">
+<h2>Findings</h2>
+<div class="prose-wide">
+
+<div class="finding">
+<p class="eyebrow">Result 1 &middot; Diffusion did not beat deterministic</p>
+<p>CLCRN is the best point forecaster on every variable and both metrics. It
+improves on AGCRN by about 4% on humidity, 11% on pressure and 2% on
+temperature, and beats USTD by 3&ndash;10% across the board. Diffusion-based
+forecasting does not inherently improve weather prediction on this data.</p>
+</div>
+
+<div class="finding">
+<p class="eyebrow">Result 2 &middot; DiffSTG was the weakest model tested</p>
+<p>Highest MAE and RMSE on every single variable. Its pressure MAE is roughly
+47% higher than USTD's and 64% higher than CLCRN's; on humidity and temperature
+it trails the others by 5&ndash;17%. This is consistent with its own authors'
+results, where it also failed to surpass its deterministic baselines.</p>
+</div>
+
+<div class="finding">
+<p class="eyebrow">Result 3 &middot; USTD was competitive</p>
+<p>It tracks AGCRN within 3% on MAE for every variable &mdash; the largest gap
+being wind speed, where AGCRN is 2.23% lower &mdash; and beats AGCRN by 12.93%
+on pressure RMSE. It also produced better probabilistic forecasts than DiffSTG on
+three of four variables.</p>
+</div>
+
+<div class="finding">
+<p class="eyebrow">Result 4 &middot; The gap is in the conditioning, not the paradigm</p>
+<p>Both models are diffusion models and both are non-autoregressive, so neither
+property explains a 47% difference. What separates them is that USTD denoises a
+representation that a deterministic encoder has already structured, and
+conditions on time of day, day of year and station height. The ablation confirms
+it directly.</p>
+</div>
+
+</div>
+
+<figure>
+<img src="assets/img/figures/chikwanha-fig4.png" width="842" height="587"
+  alt="Four line charts showing each model's monthly predicted values against the ground truth for temperature, humidity, pressure and wind speed across the 2024 to 2026 test period. All models track the seasonal shape; DiffSTG deviates furthest from the observed trajectory.">
+<figcaption><b>Predictions against ground truth across the test period.</b>
+DiffSTG captures the broad temporal structure of temperature and wind speed but
+sits further from the observed trajectory than the other three, suggesting a
+limitation in representing how the forecast evolves across the full horizon
+rather than a failure to learn the signal at all.
+<span class="src">Figure 4, Chikwanha (2026).</span></figcaption>
+</figure>
+</div>
+</section>
+
+<section id="conditioning">
+<div class="wrap">
+<div class="prose">
+<h2>Why conditioning decides it</h2>
+<p>Learning the full shape of a probability distribution, in order to give
+reliable uncertainty ranges, requires more information than learning a direct
+mapping from an input to a single output. A strong conditional representation
+gives the generative step a better foundation &mdash; particularly when the
+available observations alone do not fully describe the state of the atmosphere,
+which at 32 irregularly spaced stations they certainly do not.</p>
+
+<p>Non-autoregressive generation is not the culprit. Both diffusion models are
+non-autoregressive, yet only one underperforms; and TimeDiff, which is also
+non-autoregressive, performs strongly precisely because it adds autoregressive
+initialisation and future-mixup conditioning. What matters is how temporal
+dependencies are encoded before or during generation, not whether the forecast
+is produced in one shot.</p>
+
+<p>The ablation makes the argument empirically. Stripping USTD's exogenous
+covariates raises its RMSE on every variable, and on pressure &mdash; the
+variable most tied to station altitude &mdash; it collapses by 45%.</p>
+</div>
+
+<div class="table-scroll">
+<table>
+<caption><b>USTD ablation.</b> Test RMSE with all exogenous covariates, against
+RMSE with none. Station height is one of the covariates removed.</caption>
+<thead>
+<tr><th scope="col">Variable</th><th scope="col">All covariates</th><th scope="col">No covariates</th><th scope="col">Deterioration</th></tr>
+</thead>
+<tbody>
+<tr><th scope="row">Surface pressure (hPa)</th><td class="best">9.117</td><td>13.230</td><td>+45.1%</td></tr>
+<tr><th scope="row">Temperature (&deg;C)</th><td class="best">2.974</td><td>3.411</td><td>+14.7%</td></tr>
+<tr><th scope="row">Wind speed (m s<sup>&minus;1</sup>)</th><td class="best">1.647</td><td>1.737</td><td>+5.5%</td></tr>
+<tr><th scope="row">Relative humidity (%)</th><td class="best">13.867</td><td>14.523</td><td>+4.7%</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section class="band" id="spatial">
+<div class="wrap">
+<h2>Spatial and elevation patterns</h2>
+<div class="prose">
+<p>Following the earlier studies in the lineage, the 40 highest-weight edges of
+each model's adjacency matrix were plotted on a map of the covered provinces, so
+that what each model believes about the network can be inspected directly.</p>
+
+<p>The predefined matrix used by DiffSTG and USTD is built from weighted distance
+and is symmetric, so every edge is bidirectional and the strongest connections
+are simply the geographically closest ones &mdash; it focuses on local
+neighbourhoods and clusters accordingly. AGCRN and CLCRN, which do not use a
+predefined adjacency, learn visibly more complex and longer-range structure.</p>
+</div>
+
+<div class="grid three" style="margin-top:1.5rem">
+<figure style="margin:0">
+<img src="assets/img/figures/chikwanha-fig5.png" width="642" height="712"
+  alt="Map of the eastern provinces with 32 numbered station nodes; the 40 strongest edges of the predefined adjacency matrix connect only geographically adjacent stations in tight local clusters.">
+<figcaption><b>Predefined adjacency.</b> Used by DiffSTG and USTD &mdash; local,
+symmetric, distance-driven.
+<span class="src">Figure 5, Chikwanha (2026).</span></figcaption>
+</figure>
+<figure style="margin:0">
+<img src="assets/img/figures/chikwanha-fig6.png" width="642" height="681"
+  alt="Map of the same station network showing AGCRN's learned adjacency as directed arrows, including many long-range connections between distant stations.">
+<figcaption><b>AGCRN's learned graph.</b> Directed, and willing to connect
+distant stations.
+<span class="src">Figure 6, Chikwanha (2026).</span></figcaption>
+</figure>
+<figure style="margin:0">
+<img src="assets/img/figures/chikwanha-fig7.png" width="642" height="674"
+  alt="Map of the same station network showing CLCRN's learned spatial node embeddings as directed arrows between stations.">
+<figcaption><b>CLCRN's learned structure.</b> Conditioned on geodesic distance
+and orientation.
+<span class="src">Figure 7, Chikwanha (2026).</span></figcaption>
+</figure>
+</div>
+
+<div class="prose">
+<h3>Variability, not just position, drives error</h3>
+<p>Geographic proximity does not capture everything that matters. Node 9, the
+least stable station in the dataset with a temperature standard deviation of 8.73
+and a range of 50.8&nbsp;&deg;C (&minus;9.9 to 40.9), produces the highest MAE and
+RMSE for all four models. Coastal nodes are among the most stable and among the
+best forecast on temperature. For pressure the pattern breaks: DiffSTG performs
+particularly poorly along the KwaZulu-Natal and Eastern Cape coastlines despite
+those stations being relatively stable, so stability alone does not explain
+pressure error.</p>
+
+<h3>Elevation</h3>
+<p>Node 25 consistently shows higher temperature error than its close neighbour
+node 31, across all four models &mdash; so proximity alone does not explain the
+difference. USTD achieves the lowest error at these nodes and AGCRN also performs
+well. The same pattern recurs at three high-elevation nodes near the Free
+State&ndash;KwaZulu-Natal and Free State&ndash;Lesotho borders, and at an
+isolated Eastern Cape station. Since AGCRN learns an adaptive adjacency and USTD
+is conditioned on station height, both have a route to information that distance
+alone does not carry &mdash; which is consistent with, though not proof of, the
+elevation explanation.</p>
+</div>
+
+<figure>
+<img src="assets/img/figures/chikwanha-fig8.png" width="842" height="790"
+  alt="A grid of four maps of the covered provinces, one per model, with node-specific RMSE values overlaid on each station position.">
+<figcaption><b>Node-level RMSE by model.</b> Stations that are hard for one model
+are generally hard for all of them, but the pressure maps separate the models
+more than the other variables do.
+<span class="src">Figure 8, Chikwanha (2026).</span></figcaption>
+</figure>
+</div>
+</section>
+
+<section id="uncertainty">
+<div class="wrap">
+<div class="prose">
+<h2>Uncertainty and CRPS</h2>
+<p>The probabilistic results give a different view of the two diffusion models.
+Although USTD consistently produced lower MAE and RMSE than DiffSTG, its
+generated samples were visibly <em>more</em> dispersed, particularly for wind
+speed &mdash; so a narrower predictive distribution does not imply a more
+accurate point forecast. The central tendency of a generated distribution can be
+accurate even when individual samples span a wide range.</p>
+
+<p>CRPS resolves the ambiguity. USTD achieves lower CRPS than DiffSTG on
+pressure, temperature and humidity, with the largest improvement on pressure
+(0.0060 to 0.0043). On wind speed it is worse (0.3745 to 0.4073) despite the
+slightly lower point error &mdash; there, the extra dispersion means the
+predictive distribution is less well matched to the observations. Sample spread
+is not itself a measure of uncertainty quality; whether dispersion helps depends
+on how well the resulting distribution represents what actually happened.</p>
+
+<p>This matters for how probabilistic STGNNs should be judged. The motivation for
+diffusion-based forecasting was never purely point accuracy &mdash; it was the
+inability of conventional STGNNs to represent intrinsic uncertainty. On this
+data the diffusion formulation gave no consistent point-accuracy advantage, but
+USTD did give improved probabilistic performance on three of four variables. The
+value of a probabilistic model should be assessed on whether its predictive
+distributions are useful, not only on whether they reduce point error.</p>
+</div>
+
+<figure>
+<img src="assets/img/figures/chikwanha-fig9.png" width="842" height="615"
+  alt="Two charts comparing predicted against true values for wind speed and temperature, with the eight individual samples generated by each diffusion model shown as a spread around the mean prediction. USTD's samples are visibly more dispersed for wind speed.">
+<figcaption><b>The eight generated samples per diffusion model.</b> USTD's
+samples spread more widely, particularly on wind speed &mdash; which helps its
+CRPS on three variables and hurts it on the fourth.
+<span class="src">Figure 9, Chikwanha (2026).</span></figcaption>
+</figure>
+</div>
+</section>
+
+<section class="band" id="limits">
+<div class="wrap">
+<div class="prose">
+<h2>Limitations and future work</h2>
+<p>Each weather variable was modelled independently and the network covers 32
+stations across four provinces, so multivariate forecasting and larger, more
+geographically diverse networks are both open. Evaluation focused on overall
+forecasting error rather than performance during extreme weather, which would be
+a more practically relevant test of robustness &mdash; the continuous-time
+workstream takes that question up directly.</p>
+
+<p>Inverse-distance weighting for missing observations may introduce bias by
+relying on spatial proximity rather than elevation or local topography, which the
+elevation results suggest matters here. The four models also differ in
+architecture <em>and</em> in available contextual inputs, so performance
+differences cannot be cleanly attributed to individual components; more
+controlled ablations would be needed to isolate the effects of spatial structure,
+temporal conditioning and exogenous variables. Finally, probabilistic evaluation
+was limited to the diffusion models, since the baselines produce point forecasts
+only &mdash; comparing against probabilistic versions of deterministic STGNNs,
+and assessing calibration during extreme events, would strengthen the
+comparison.</p>
+</div>
+</div>
+</section>
+
+<section id="docs">
+<div class="wrap">
+<h2>Documents</h2>
+<ul class="doclist">
+<li><a href="assets/docs/final-paper-chikwanha.pdf">
+  <span class="t">Final paper</span>
+  <span class="d">Weather Flow Prediction using Diffusion-Based Spatial-Temporal Graph Neural Networks</span>
+  <span class="meta">PDF</span></a></li>
+<li><span class="pending">
+  <span class="t">Literature review</span>
+  <span class="d">Individual literature review.</span>
+  <span class="meta">To be added</span></span></li>
+<li><a href="resources.html#code">
+  <span class="t">Source code</span>
+  <span class="d">Model implementations, preprocessing and evaluation scripts.</span>
+  <span class="meta">Archive</span></a></li>
+<li><a href="assets/docs/weatherflow-poster.pdf">
+  <span class="t">Project poster</span>
+  <span class="d">Joint deliverable covering all three workstreams.</span>
+  <span class="meta">PDF</span></a></li>
+</ul>
+
+<div class="next-prev">
+<span><a href="continuous-time.html">&larr; Continuous-time workstream</a></span>
+<span><a href="lightweight.html">Lightweight workstream &rarr;</a></span>
+</div>
+</div>
+</section>

@@ -1,0 +1,204 @@
+<section class="page-head">
+<div class="wrap">
+<p class="eyebrow"><span class="tag light">Workstream 3</span> Individual contribution</p>
+<h1>Lightweight STGNNs for weather prediction</h1>
+<p class="tagline">Zoleka Fuyana &mdash; how much forecasting accuracy survives a
+hard cut to the parameter budget, and where extra capacity stops paying for
+itself.</p>
+
+<ul class="pill-row" style="margin-top:1.6rem">
+<li><a class="pill" href="results.html#light">Results in context</a></li>
+<li><a class="pill" href="assets/docs/weatherflow-poster.pdf">Project poster (PDF)</a></li>
+<li><a class="pill" href="resources.html#code">Source code</a></li>
+</ul>
+
+<nav class="toc" aria-label="On this page">
+<p>On this page</p>
+<ol>
+<li><a href="#question">Research question</a></li>
+<li><a href="#models">The two lightweight models</a></li>
+<li><a href="#method">Method</a></li>
+<li><a href="#findings">Findings</a></li>
+<li><a href="#context">In context with the other workstreams</a></li>
+<li><a href="#docs">Documents</a></li>
+</ol>
+</nav>
+</div>
+</section>
+
+<div class="wrap" style="padding-top:1.5rem">
+<div class="note">
+<p><strong>This page is awaiting its final paper.</strong> The research question,
+models and headline results below are accurate and are drawn from the project
+poster. The full method, result tables, figures and discussion will be added when
+the final paper for this workstream is available. Nothing on this page is a
+placeholder claim &mdash; sections that are incomplete say so explicitly.</p>
+</div>
+</div>
+
+<section id="question">
+<div class="wrap">
+<div class="prose">
+<h2>Research question</h2>
+<p>Accuracy reported in the STGNN literature is usually bought with parameters,
+and the parameter budget is rarely treated as a variable of interest in its own
+right. Benchmarks reward the lowest error and report model size, if at all, as a
+footnote.</p>
+
+<p>This workstream inverts the question. Rather than asking how much accuracy a
+larger model can reach, it asks <strong>how much accuracy survives when the
+parameter budget is cut hard</strong>, and at what point additional capacity
+stops earning its cost. Two lightweight architectures &mdash;
+<strong>STLGRU</strong> and <strong>LiteSTGNN</strong> &mdash; are evaluated
+against the same AGCRN and CLCRN baselines, on the same 32-station network and
+the same 48-hour horizon as the other two workstreams.</p>
+
+<p>The question is operational as much as scientific. A model cheap enough to
+retrain frequently, or to run where compute is scarce, can be worth more in
+practice than a marginally more accurate model that is neither &mdash; and South
+African weather services are exactly the kind of setting where that trade-off is
+real rather than hypothetical.</p>
+</div>
+</div>
+</section>
+
+<section class="band" id="models">
+<div class="wrap">
+<h2>The two lightweight models</h2>
+<div class="grid two" style="margin-top:1rem">
+<article class="card work light">
+<p><span class="tag light">Lightweight</span></p>
+<h3>STLGRU</h3>
+<p>A spatio-temporal lightweight gated recurrent architecture. The larger of the
+two models in this workstream &mdash; <strong>4.1&times; the parameter count of
+LiteSTGNN</strong>.</p>
+<p class="more"><em>Full architectural description to follow with the final
+paper.</em></p>
+</article>
+
+<article class="card work light">
+<p><span class="tag light">Lightweight</span></p>
+<h3>LiteSTGNN</h3>
+<p>The smaller of the two, and the more aggressive reduction in capacity. Its
+performance relative to STLGRU is what makes the diminishing-returns result
+measurable.</p>
+<p class="more"><em>Full architectural description to follow with the final
+paper.</em></p>
+</article>
+</div>
+</div>
+</section>
+
+<section id="method">
+<div class="wrap">
+<div class="prose">
+<h2>Method</h2>
+<p>This workstream runs on the project's shared foundation: the same 32 South
+African Weather Service stations, the same hourly record from 2016 to 2025, the
+same chronological 60&nbsp;/&nbsp;20&nbsp;/&nbsp;20 split, the same inverse-distance
+imputation, the same four forecast targets, the same 48-hour horizon reported at
+3, 6, 9, 12, 24 and 48 hours, and the same two baselines. See the
+<a href="index.html#documents">shared experimental setup</a> for the full
+specification.</p>
+
+<p>Evaluation pairs standard forecasting error with the cost side of the
+trade-off &mdash; trainable parameter count and inference cost &mdash; so that
+accuracy and capacity can be read against one another rather than separately.</p>
+
+<div class="note">
+<p><strong>To be completed.</strong> Seed count, hyperparameter search procedure,
+input regime and hardware for this workstream are not yet documented here and
+are marked as "to be confirmed" in the
+<a href="results.html#protocols">protocol comparison</a>.</p>
+</div>
+</div>
+</div>
+</section>
+
+<section class="band" id="findings">
+<div class="wrap">
+<h2>Findings</h2>
+<div class="prose-wide">
+
+<div class="finding">
+<p class="eyebrow">Result 1 &middot; Capacity gives sharply diminishing returns</p>
+<p><strong>STLGRU is 4.1&times; the size of LiteSTGNN and improves MAE by only
+0.7&ndash;5.7%.</strong> A fourfold increase in parameters buys a few percent of
+accuracy &mdash; which is the central quantitative claim of this workstream and
+a direct answer to the research question.</p>
+</div>
+
+<div class="finding">
+<p class="eyebrow">Result 2 &middot; Competitive, but variable-dependent</p>
+<p>Lightweight performance was competitive with the established baselines, but
+which model wins depends on which variable is being forecast. There is no single
+ordering that holds across temperature, pressure, humidity and wind speed
+&mdash; the same variable-dependence the other two workstreams report.</p>
+</div>
+
+<div class="note">
+<p><strong>Full results to follow.</strong> Per-variable, per-horizon error
+tables, the parameter and inference-cost comparison, and the figures from the
+final paper will be published here and in
+<a href="results.html#light">Results</a> once the paper is available.</p>
+</div>
+
+</div>
+</div>
+</section>
+
+<section id="context">
+<div class="wrap">
+<div class="prose">
+<h2>In context with the other workstreams</h2>
+<p>This workstream's result is the clearest statement of a pattern that appears
+across the whole project from three independent directions.</p>
+
+<p>Approaching from the opposite end, the <a href="continuous-time.html">continuous-time
+workstream</a> found the most accurate of its four models was also among the
+cheapest &mdash; 138,096 parameters against 1,663,104 for the weakest &mdash; and
+that CLCRN, the smallest of the four, separated from the far larger STGODE on
+every variable. Parameter count and inference speed did not even track one
+another there, so no ranking of those four was bought with scale.</p>
+
+<p>Meanwhile the <a href="diffusion.html">diffusion workstream</a> found that
+what distinguished its two models was not capacity but conditioning: giving the
+generative step a well-structured representation and three cheap covariates was
+worth more than any amount of additional generative machinery.</p>
+
+<p>Taken together: on this dataset, at this network size, <strong>model size and
+model accuracy are close to unrelated</strong>. What a model is given to work
+with &mdash; the graph, the covariates, the conditioning &mdash; matters
+considerably more than how large it is.</p>
+</div>
+</div>
+</section>
+
+<section class="band" id="docs">
+<div class="wrap">
+<h2>Documents</h2>
+<ul class="doclist">
+<li><span class="pending">
+  <span class="t">Final paper</span>
+  <span class="d">Lightweight spatio-temporal graph neural networks for weather prediction on South African station data.</span>
+  <span class="meta">To be added</span></span></li>
+<li><span class="pending">
+  <span class="t">Literature review</span>
+  <span class="d">Individual literature review.</span>
+  <span class="meta">To be added</span></span></li>
+<li><a href="assets/docs/weatherflow-poster.pdf">
+  <span class="t">Project poster</span>
+  <span class="d">Joint deliverable covering all three workstreams, including the lightweight results summarised above.</span>
+  <span class="meta">PDF</span></a></li>
+<li><a href="resources.html#code">
+  <span class="t">Source code</span>
+  <span class="d">Model implementations, preprocessing and evaluation scripts.</span>
+  <span class="meta">Archive</span></a></li>
+</ul>
+
+<div class="next-prev">
+<span><a href="diffusion.html">&larr; Diffusion workstream</a></span>
+<span><a href="resources.html">Resources &rarr;</a></span>
+</div>
+</div>
+</section>

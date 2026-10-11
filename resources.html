@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resources — WeatherFLOW</title>
+<meta name="description" content="Every document, figure and source-code archive produced by the WeatherFLOW honours project.">
+<meta name="author" content="Génevieve Chikwanha, Zoleka Fuyana, Praise Jaravani">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<div class="wrap">
+<a class="brand" href="index.html"><svg class="mark" viewBox="0 0 24 24" width="19" height="19" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="7" r="1.9"/><circle cx="18" cy="5.5" r="1.9"/><circle cx="12" cy="13" r="1.9"/><circle cx="19" cy="17.5" r="1.9"/><circle cx="5.5" cy="18" r="1.9"/><path d="M6.6 8.2 10.6 11.8M16.2 6.4 13.2 11.3M13.5 14.2 17.2 16.4M10.4 14.2 6.8 16.6M6.9 7.3h9.3"/></svg><span>WeatherFLOW</span> <span class="sub">UCT&nbsp;Honours&nbsp;2026</span></a>
+<nav class="site-nav" aria-label="Main">
+<ul>
+<li><a href="index.html">Overview</a></li>
+<li><a href="background.html">Background</a></li>
+<li><a href="results.html">Results</a></li>
+<li><a href="continuous-time.html">Continuous-time</a></li>
+<li><a href="diffusion.html">Diffusion</a></li>
+<li><a href="lightweight.html">Lightweight</a></li>
+<li><a href="resources.html" aria-current="page">Resources</a></li>
+</ul>
+</nav>
+</div>
+</header>
+<main id="main">
+<section class="page-head">
+<div class="wrap">
+<p class="eyebrow">Everything in one place</p>
+<h1>Resources</h1>
+<p class="tagline">Every document, figure and source-code archive the project
+produced, with a note on what is not here and why.</p>
+
+<nav class="toc" aria-label="On this page">
+<p>On this page</p>
+<ol>
+<li><a href="#joint">Joint deliverables</a></li>
+<li><a href="#papers">Final papers</a></li>
+<li><a href="#reviews">Literature reviews</a></li>
+<li><a href="#code">Source code</a></li>
+<li><a href="#data">Data availability</a></li>
+<li><a href="#figures">Figures</a></li>
+<li><a href="#cite">How to cite</a></li>
+<li><a href="#colophon">About this site</a></li>
+</ol>
+</nav>
+</div>
+</section>
+
+<section id="joint">
+<div class="wrap">
+<h2>Joint deliverables</h2>
+<p class="prose">Documents produced by the team as a whole.</p>
+<ul class="doclist">
+<li><a href="assets/docs/weatherflow-poster.pdf">
+  <span class="t">Project poster</span>
+  <span class="d">Objectives, data, models, results and conclusions for all three workstreams on one page.</span>
+  <span class="meta">PDF</span></a></li>
+<li><a href="assets/docs/project-proposal.pdf">
+  <span class="t">Project proposal</span>
+  <span class="d">Weather Flow Prediction using Spatial-Temporal Graph Neural Networks &mdash; joint proposal by Chikwanha, Fuyana and Jaravani.</span>
+  <span class="meta">PDF &middot; 10 pp</span></a></li>
+</ul>
+</div>
+</section>
+
+<section class="band" id="papers">
+<div class="wrap">
+<h2>Final papers</h2>
+<p class="prose">One per student. Each reports that student's own workstream
+against the two shared baselines.</p>
+<ul class="doclist">
+<li><a href="assets/docs/final-paper-chikwanha.pdf">
+  <span class="t">Génevieve Chikwanha</span>
+  <span class="d">Weather Flow Prediction using Diffusion-Based Spatial-Temporal Graph Neural Networks</span>
+  <span class="meta">PDF &middot; 18 pp</span></a></li>
+<li><span class="pending">
+  <span class="t">Zoleka Fuyana</span>
+  <span class="d">Lightweight spatio-temporal graph neural networks for weather prediction.</span>
+  <span class="meta">To be added</span></span></li>
+<li><a href="assets/docs/final-paper-jaravani.pdf">
+  <span class="t">Praise Jaravani</span>
+  <span class="d">Continuous-Time and Discrete Spatio-Temporal Graph Neural Networks for Normal and Extreme Weather Prediction on South African Station Data</span>
+  <span class="meta">PDF &middot; 17 pp</span></a></li>
+</ul>
+</div>
+</section>
+
+<section id="reviews">
+<div class="wrap">
+<h2>Literature reviews</h2>
+<p class="prose">One per student, submitted earlier in the project.</p>
+<ul class="doclist">
+<li><span class="pending">
+  <span class="t">Génevieve Chikwanha</span>
+  <span class="d">Individual literature review.</span>
+  <span class="meta">To be added</span></span></li>
+<li><span class="pending">
+  <span class="t">Zoleka Fuyana</span>
+  <span class="d">Individual literature review.</span>
+  <span class="meta">To be added</span></span></li>
+<li><span class="pending">
+  <span class="t">Praise Jaravani</span>
+  <span class="d">Individual literature review.</span>
+  <span class="meta">To be added</span></span></li>
+</ul>
+</div>
+</section>
+
+<section class="band" id="code">
+<div class="wrap">
+<h2>Source code</h2>
+<div class="prose">
+<p>WeatherFLOW follows a layered design, separating shared data and evaluation
+utilities from the model integrations above them. Upstream model repositories are
+vendored at pinned commits and never modified; each integration is an adapter
+that wraps the published code behind a common interface for model construction,
+forward computation, prediction and parameter counting &mdash; so every
+experiment runs the code the original authors released, over identical
+preprocessed tensors, splits, loss, optimiser, seeds and evaluation suite.</p>
+</div>
+
+<ul class="doclist">
+<li><a href="assets/code/weatherflow-source.zip">
+  <span class="t">WeatherFLOW framework</span>
+  <span class="d">Preprocessing, model adapters, training harness, evaluation suite, experiment configuration and analysis scripts.</span>
+  <span class="meta">ZIP</span></a></li>
+</ul>
+
+<div class="note">
+<p><strong>What the archive excludes.</strong> Raw and preprocessed station data,
+trained model checkpoints, the Singularity container image and raw run outputs
+are omitted &mdash; together they exceed 19&nbsp;GB, and the station data is not
+ours to redistribute (see <a href="#data">Data availability</a>). The archive
+contains the code required to reproduce the pipeline once the data is obtained
+from SAWS.</p>
+</div>
+</div>
+</section>
+
+<section id="data">
+<div class="wrap">
+<div class="prose">
+<h2>Data availability</h2>
+<p>The station observations used throughout this project were supplied by the
+<strong>South African Weather Service</strong> for research use, under the SAWS
+data policy. They are <strong>not redistributed on this website</strong>. The
+dataset is available on request from SAWS; the list of stations used, with their
+coordinates and elevations, is given in the appendices of the final papers, so
+the same network can be requested and reconstructed.</p>
+
+<p>The data contains no personally identifiable information &mdash; it comprises
+physical measurements from automatic weather stations. Station identities and
+coordinates are reported in the papers because they are a matter of public
+record and are necessary to interpret the geographic results.</p>
+
+<div class="note">
+<p><strong>A note on intended use.</strong> Forecasts of extreme weather carry
+asymmetric risk: a missed heatwave or storm costs more than a false alarm. The
+models evaluated here are not calibrated for operational warning, and these
+results are reported as a benchmark comparison. They should not be read as
+evidence of readiness for deployment in a public warning system.</p>
+</div>
+</div>
+</div>
+</section>
+
+<section class="band" id="figures">
+<div class="wrap">
+<div class="prose">
+<h2>Figures</h2>
+<p>Every figure on this website is reproduced directly from the final papers, at
+the resolution the papers embed, so that what is shown here and what was
+submitted are the same artefact. Each figure carries its source paper and figure
+number in its caption.</p>
+<p>Figures appear on <a href="results.html">Results</a>,
+<a href="continuous-time.html">Continuous-time</a>,
+<a href="diffusion.html">Diffusion</a> and
+<a href="index.html#documents">Overview</a>. The full set, including those not
+reproduced here, is in the papers themselves.</p>
+</div>
+</div>
+</section>
+
+<section id="cite">
+<div class="wrap">
+<h2>How to cite</h2>
+<div class="prose">
+<p>Cite the individual paper for the workstream you are referring to.</p>
+</div>
+
+<details class="bib">
+<summary>BibTeX &mdash; continuous-time workstream (Jaravani)</summary>
+<pre><code>@mastersthesis{jaravani2026continuous,
+  title   = {Continuous-Time and Discrete Spatio-Temporal Graph Neural Networks
+             for Normal and Extreme Weather Prediction on South African
+             Station Data},
+  author  = {Jaravani, Praise},
+  school  = {University of Cape Town},
+  type    = {Honours project},
+  address = {Cape Town, South Africa},
+  year    = {2026}
+}</code></pre>
+</details>
+
+<details class="bib">
+<summary>BibTeX &mdash; diffusion workstream (Chikwanha)</summary>
+<pre><code>@mastersthesis{chikwanha2026diffusion,
+  title   = {Weather Flow Prediction using Diffusion-Based Spatial-Temporal
+             Graph Neural Networks},
+  author  = {Chikwanha, G{\'e}nevieve},
+  school  = {University of Cape Town},
+  type    = {Honours project},
+  address = {Cape Town, South Africa},
+  year    = {2026}
+}</code></pre>
+</details>
+
+<details class="bib">
+<summary>BibTeX &mdash; the project as a whole</summary>
+<pre><code>@misc{weatherflow2026,
+  title        = {WeatherFLOW: Weather Prediction using Spatio-Temporal Graph
+                  Neural Networks},
+  author       = {Chikwanha, G{\'e}nevieve and Fuyana, Zoleka and
+                  Jaravani, Praise},
+  howpublished = {Honours project, Department of Computer Science,
+                  University of Cape Town},
+  year         = {2026}
+}</code></pre>
+</details>
+</div>
+</section>
+
+<section class="band" id="colophon">
+<div class="wrap">
+<div class="prose">
+<h2>About this site</h2>
+<p>Static HTML and one hand-written stylesheet. No framework, no build step at
+view time, no JavaScript, and no external requests &mdash; every asset,
+including the two typefaces, is served from this archive by relative path, so
+the site renders identically whether it is opened from a web server or straight
+off disk.</p>
+
+<dl class="kv" style="margin-top:1.5rem">
+<dt>Markup</dt><dd>Hand-written HTML, validated against the W3C Nu HTML Checker</dd>
+<dt>Styling</dt><dd>One stylesheet, CSS custom properties, grid and flexbox; light and dark palettes</dd>
+<dt>Typefaces</dt><dd>Source Serif 4 and Inter, both SIL Open Font License 1.1, subset to Latin and vendored locally</dd>
+<dt>Figures</dt><dd>Extracted from the final-paper PDFs at 240&nbsp;dpi</dd>
+<dt>External links</dt><dd>One, to the departmental project archive, labelled where it appears</dd>
+</dl>
+
+<div class="next-prev" style="margin-top:2rem">
+<span><a href="lightweight.html">&larr; Lightweight workstream</a></span>
+<span><a href="index.html">Overview &rarr;</a></span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="site-footer">
+<div class="wrap">
+<div class="cols">
+<div>
+<h2>Project</h2>
+<ul>
+<li><a href="index.html">Overview</a></li>
+<li><a href="background.html">Background</a></li>
+<li><a href="results.html">Results</a></li>
+<li><a href="resources.html">Resources</a></li>
+</ul>
+</div>
+<div>
+<h2>Workstreams</h2>
+<ul>
+<li><a href="continuous-time.html">Continuous-time &mdash; Jaravani</a></li>
+<li><a href="diffusion.html">Diffusion-based &mdash; Chikwanha</a></li>
+<li><a href="lightweight.html">Lightweight &mdash; Fuyana</a></li>
+</ul>
+</div>
+<div>
+<h2>Key documents</h2>
+<ul>
+<li><a href="assets/docs/weatherflow-poster.pdf">Project poster (PDF)</a></li>
+<li><a href="assets/docs/final-paper-jaravani.pdf">Final paper &mdash; Jaravani (PDF)</a></li>
+<li><a href="assets/docs/final-paper-chikwanha.pdf">Final paper &mdash; Chikwanha (PDF)</a></li>
+</ul>
+</div>
+<div>
+<h2>Department</h2>
+<ul>
+<li>Department of Computer Science</li>
+<li>University of Cape Town</li>
+<li>Supervisor: A/Prof Deshendran Moodley</li>
+</ul>
+</div>
+</div>
+<div class="colophon">
+<p>WeatherFLOW &mdash; CSC4002W honours project, Department of Computer Science,
+University of Cape Town, 2026.</p>
+<p>Station observations supplied by the South African Weather Service and used
+under their data policy. Computation on the UCT ICTS High-Performance Computing
+cluster. This work is based on research supported in part by the National
+Research Foundation of South Africa (ref. PMDS251030376307).</p>
+</div>
+</div>
+</footer>
+</body>
+</html>

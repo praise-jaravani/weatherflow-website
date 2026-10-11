@@ -1,0 +1,150 @@
+{
+  "jaravani": [
+    {
+      "file": "jaravani-fig1.png",
+      "fig": 1,
+      "page": 4,
+      "w": 842,
+      "h": 232,
+      "caption": "Figure 1: The WeatherFLOW experimental pipeline."
+    },
+    {
+      "file": "jaravani-fig2.png",
+      "fig": 2,
+      "page": 4,
+      "w": 842,
+      "h": 830,
+      "caption": "Figure 2: The 32-station SAWS network (2016\u20132025), concen- trated in the eastern half of the country."
+    },
+    {
+      "file": "jaravani-fig3.png",
+      "fig": 3,
+      "page": 8,
+      "w": 842,
+      "h": 768,
+      "caption": "Figure 3: Extreme-hour against all-hour MAE per variable, relative to the best cell, one marker per model; subtitles give Table 5\u2019s degradation range. Plotted on the interquartile mean, so CLCRN\u2019s temperature point is not inflated by the divergent run."
+    },
+    {
+      "file": "jaravani-fig4.png",
+      "fig": 4,
+      "page": 8,
+      "w": 842,
+      "h": 754,
+      "caption": "Figure 4: Test MAE against forecast lead for each target vari- able, on log axes, with the persistence and climatology base- lines; means over ten seeds. Persistence\u2019s diurnal sawtooth and the narrowing between architectures with lead are both visible."
+    },
+    {
+      "file": "jaravani-fig5.png",
+      "fig": 5,
+      "page": 9,
+      "w": 842,
+      "h": 671,
+      "caption": "Figure 5: Factorial read of the design: each panel plots a vari- able\u2019s four cell means against the temporal axis, one line for the learned adaptive graph (AGCRN \u2192 MTGODE) and one for the geometric prior (CLCRN \u2192 STGODE); the subtitle gives the interaction. Interquartile means over ten seeds."
+    },
+    {
+      "file": "jaravani-fig6.png",
+      "fig": 6,
+      "page": 12,
+      "w": 842,
+      "h": 813,
+      "caption": "Figure 6: The December 2024 heatwave at Makatini, at 24- hour lead. Top: observed temperature and each model\u2019s fore- cast, with hour- and calendar-relative exceedance shaded. Bottom: each detection model\u2019s exceedance probability and its frozen decision threshold."
+    },
+    {
+      "file": "jaravani-fig7.png",
+      "fig": 7,
+      "page": 13,
+      "w": 1722,
+      "h": 651,
+      "caption": "Figure 7: Left: every run\u2019s MAE relative to the best cell, one point per seed (190 in total), by variable and model, with the divergent CLCRN temperature run marked. Right: the probability that a randomly drawn run of one model beats another, by target, with 95% intervals."
+    },
+    {
+      "file": "jaravani-fig8.png",
+      "fig": 8,
+      "page": 14,
+      "w": 2020,
+      "h": 1431,
+      "caption": "Figure 8: Per-station test MAE for one model per variable, named in each panel, one marker per station on the network map; subtitles give coastal against inland medians and a Mann\u2013Whitney \ud835\udc5d . The four models\u2019 per-station error ranks correlate 0.98 to 1.00, so difficulty is shared."
+    }
+  ],
+  "chikwanha": [
+    {
+      "file": "chikwanha-fig1.png",
+      "fig": 1,
+      "page": 3,
+      "w": 842,
+      "h": 719,
+      "caption": "Figure 1: A map showing the region covered in the SAWS dataset, along with each station."
+    },
+    {
+      "file": "chikwanha-fig2.png",
+      "fig": 2,
+      "page": 6,
+      "w": 842,
+      "h": 633,
+      "caption": "Figure 2: Ablation study showing the impact of exogenous variables on USTD\u2019s predictive performance."
+    },
+    {
+      "file": "chikwanha-fig3.png",
+      "fig": 3,
+      "page": 7,
+      "w": 842,
+      "h": 634,
+      "caption": "Figure 3: RMSE scores across 3, 6, 9, 12, 24, and 48 hour hori- zons for CLCRN, AGCRN, DiffSTG, and USTD."
+    },
+    {
+      "file": "chikwanha-fig4.png",
+      "fig": 4,
+      "page": 7,
+      "w": 842,
+      "h": 587,
+      "caption": "Figure 4: Each model\u2019s predicted values versus the ground truth value for each attribute across the test set."
+    },
+    {
+      "file": "chikwanha-fig5.png",
+      "fig": 5,
+      "page": 8,
+      "w": 642,
+      "h": 712,
+      "caption": "Figure 5: DiffSTG and USTD\u2019s fixed adjacency matrix showing the strongest 40 connections overlayed on a map of KZN, EC, Gauteng, and Free State"
+    },
+    {
+      "file": "chikwanha-fig6.png",
+      "fig": 6,
+      "page": 8,
+      "w": 642,
+      "h": 681,
+      "caption": "Figure 6: AGCRN\u2019s spatial node embeddings."
+    },
+    {
+      "file": "chikwanha-fig7.png",
+      "fig": 7,
+      "page": 8,
+      "w": 642,
+      "h": 674,
+      "caption": "Figure 7: CLCRN\u2019s spatial node embeddings."
+    },
+    {
+      "file": "chikwanha-fig8.png",
+      "fig": 8,
+      "page": 9,
+      "w": 842,
+      "h": 790,
+      "caption": "Figure 8: A grid of graphs containing node-specific RMSE er- rors which are overlaid on a map of the investigated regions."
+    },
+    {
+      "file": "chikwanha-fig9.png",
+      "fig": 9,
+      "page": 9,
+      "w": 842,
+      "h": 615,
+      "caption": "Figure 9: Predicted value versus true value for wind speed and temperature, including the eight samples generated by the diffusion models."
+    },
+    {
+      "file": "chikwanha-fig10.png",
+      "fig": 10,
+      "page": 16,
+      "w": 1218,
+      "h": 1322,
+      "caption": "Figure 10: The 100 strongest off-diagonal edges in the predefined adjacency matrix used by USTD and DiffSTG."
+    }
+  ]
+}
