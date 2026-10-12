@@ -467,13 +467,23 @@ tbody.group-head tr:hover { background: var(--paper-3); }
 
 /* -------------------------------------------------------------- figures -- */
 figure { margin: 2.25rem 0; }
+/* Every figure PNG carries real width/height attributes (set at extraction
+   time), so leaving CSS width unset renders each one at its native pixel
+   size — crisp, and never larger than the source. max-width still shrinks
+   it to fit a narrow viewport or a grid column; nothing here stretches a
+   small source image up to fill a wide desktop column the way `width:100%`
+   used to. */
 figure img {
-  display: block; width: 100%; background: #fff;
+  display: block; max-width: 100%; height: auto; margin-inline: auto;
+  background: #fff;
   border: 1px solid var(--rule); border-radius: var(--radius);
   box-shadow: var(--sh-1); transition: box-shadow var(--med), transform var(--med);
 }
 figure:hover img { box-shadow: var(--sh-2); }
-figcaption { font-size: .855rem; line-height: 1.6; color: var(--ink-2); margin-top: .85rem; }
+figcaption {
+  max-width: 52rem; margin: .85rem auto 0;
+  font-size: .855rem; line-height: 1.6; color: var(--ink-2);
+}
 figcaption b { color: var(--ink); font-weight: 600; }
 figcaption .src { display: block; margin-top: .35rem; color: var(--ink-3); font-size: .79rem; }
 

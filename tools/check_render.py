@@ -15,7 +15,12 @@ import os, subprocess, sys, shutil, glob
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MAX_GAP = 700          # px of uniform blank allowed mid-page
-VIEW = (1400, 5200)
+# A fixed window height crops anything taller than it rather than scaling
+# the capture to fit — found the hard way when 5200px silently truncated
+# continuous-time.html (actual height ~14000px) and the check never looked
+# at its lower two-thirds. 16000px clears every page with real headroom;
+# a page that ever grows past that will need this raised again.
+VIEW = (1400, 16000)
 
 CANDIDATES = [
     "/mnt/c/Program Files/Google/Chrome/Application/chrome.exe",

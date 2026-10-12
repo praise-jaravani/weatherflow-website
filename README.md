@@ -22,7 +22,7 @@ link works; all motion is suppressed under `prefers-reduced-motion`.
 |---|---|
 | Pages | 7 |
 | Internal links | 273, all resolving |
-| External links | 1 (the departmental project archive) |
+| External links | 3 (departmental project archive, 2 live GitHub repos) |
 | HTML validation | 0 errors, 0 warnings — W3C Nu checker |
 | CSS validation | valid — W3C CSS validator |
 | Renders from `file://` | verified in headless Chrome |
