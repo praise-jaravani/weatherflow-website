@@ -190,7 +190,7 @@ forecasting does not inherently improve weather prediction on this data.</p>
 </div>
 
 <div class="finding">
-<p class="eyebrow">Result 2 &middot; DiffSTG was the weakest model tested</p>
+<p class="eyebrow">Result 2 &middot; DiffSTG was the weakest of the four</p>
 <p>Highest MAE and RMSE on every single variable. Its pressure MAE is roughly
 47% higher than USTD's and 64% higher than CLCRN's; on humidity and temperature
 it trails the others by 5&ndash;17%. This is consistent with its own authors'
@@ -218,7 +218,7 @@ it directly.</p>
 
 <figure>
 <img src="assets/img/figures/chikwanha-fig4.png" width="842" height="587"
-  alt="Four line charts showing each model's monthly predicted values against the ground truth for temperature, humidity, pressure and wind speed across the 2024 to 2026 test period. All models track the seasonal shape; DiffSTG deviates furthest from the observed trajectory.">
+  alt="Four line charts showing each model's monthly predicted values against the ground truth for temperature, humidity, pressure and wind speed across the 2024 to 2025 test period. All models track the seasonal shape; DiffSTG deviates furthest from the observed trajectory.">
 <figcaption><b>Predictions against ground truth across the test period.</b>
 DiffSTG captures the broad temporal structure of temperature and wind speed but
 sits further from the observed trajectory than the other three, suggesting a
@@ -249,7 +249,7 @@ is produced in one shot.</p>
 
 <p>The ablation makes the argument empirically. Stripping USTD's exogenous
 covariates raises its RMSE on every variable, and on pressure &mdash; the
-variable most tied to station altitude &mdash; it collapses by 45%.</p>
+variable most tied to station altitude &mdash; the error rises by 45%.</p>
 </div>
 
 <div class="table-scroll">

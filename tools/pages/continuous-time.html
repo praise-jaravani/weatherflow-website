@@ -158,7 +158,7 @@ graph-learner embedding dimension had been conflated with the convolutional
 width; and the spatial vector field was implemented at half the required
 magnitude. No result produced before these corrections is reported.</p>
 
-<p>One inherited hyperparameter also needed repair. The 2023 study's AGCRN
+<p>One inherited hyperparameter also needed repair. Gaibie et al.'s AGCRN
 learning rate of 0.01 exceeds the ceiling of the original authors' published
 search range and diverged on this network, with best validation at epoch 1. A
 pre-registered single-seed diagnostic selected the original published optimum of
@@ -298,7 +298,8 @@ establish a rate.</p>
 <caption><b>Probability that a random run of the first model attains lower test
 MAE than a random run of the second</b>, estimated over all 10&times;10
 cross-pairs with 95% percentile-bootstrap intervals. Bold marks intervals
-excluding 0.5. Twenty-two of twenty-four comparisons separate.</caption>
+excluding 0.5. Twenty-two of twenty-four comparisons separate; the only one that
+separates in the opposite direction is AGCRN against STGODE on pressure.</caption>
 <thead>
 <tr><th scope="col">Comparison</th><th scope="col">t2m</th><th scope="col">sp</th><th scope="col">rh</th><th scope="col">ws</th></tr>
 </thead>
@@ -308,7 +309,7 @@ excluding 0.5. Twenty-two of twenty-four comparisons separate.</caption>
 <tr><th scope="row">MTGODE &gt; STGODE</th><td class="best">1.0 [1.0,&nbsp;1.0]</td><td class="best">.93 [.80,&nbsp;1.0]</td><td class="best">1.0 [1.0,&nbsp;1.0]</td><td class="best">1.0 [1.0,&nbsp;1.0]</td></tr>
 <tr><th scope="row">CLCRN &gt; AGCRN</th><td class="best">.88 [.67,&nbsp;1.0]</td><td class="best">.98 [.91,&nbsp;1.0]</td><td class="best">1.0 [1.0,&nbsp;1.0]</td><td class="best">1.0 [1.0,&nbsp;1.0]</td></tr>
 <tr><th scope="row">CLCRN &gt; STGODE</th><td class="best">.90 [.70,&nbsp;1.0]</td><td class="best">.83 [.63,&nbsp;.97]</td><td class="best">1.0 [1.0,&nbsp;1.0]</td><td class="best">1.0 [1.0,&nbsp;1.0]</td></tr>
-<tr><th scope="row">AGCRN &gt; STGODE</th><td class="best">1.0 [1.0,&nbsp;1.0]</td><td>.20 [.04,&nbsp;.42]</td><td class="best">1.0 [1.0,&nbsp;1.0]</td><td class="best">.87 [.65,&nbsp;1.0]</td></tr>
+<tr><th scope="row">AGCRN &gt; STGODE</th><td class="best">1.0 [1.0,&nbsp;1.0]</td><td class="best">.20 [.04,&nbsp;.42]</td><td class="best">1.0 [1.0,&nbsp;1.0]</td><td class="best">.87 [.65,&nbsp;1.0]</td></tr>
 </tbody>
 </table>
 </div>
@@ -402,7 +403,7 @@ criteria fall into two families &mdash; average-case skill and tail amplitude
 than a single ranking.</p>
 
 <h3>The results transfer in scale but not in order</h3>
-<p>The 2023 study ranks AGCRN ahead of CLCRN on temperature, humidity and wind
+<p>Gaibie et al. rank AGCRN ahead of CLCRN on temperature, humidity and wind
 speed from three runs without dispersion; here CLCRN separates from AGCRN on all
 four, the two studies agreeing only on pressure. Several factors are confounded
 &mdash; the eastern rather than Cape network, the inherited optima, and three

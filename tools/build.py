@@ -46,7 +46,7 @@ PAGES = {
     ),
     "results.html": dict(
         title=f"Results — {SITE}",
-        desc="Forecasting accuracy of eight STGNN architectures against two shared "
+        desc="Forecasting accuracy of six new STGNN architectures against two shared "
              "baselines on 32 South African weather stations, to 48 hours ahead.",
     ),
     "continuous-time.html": dict(

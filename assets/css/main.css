@@ -490,7 +490,7 @@ figcaption .src { display: block; margin-top: .35rem; color: var(--ink-3); font-
 /* ------------------------------------------------------------ documents -- */
 .doclist { list-style: none; margin: 1.3rem 0; padding: 0; border-top: 1px solid var(--rule); }
 .doclist li { margin: 0; border-bottom: 1px solid var(--rule); }
-.doclist a, .doclist .pending {
+.doclist a {
   display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap;
   padding: 1rem .9rem; text-decoration: none; color: var(--ink);
   border-radius: var(--radius-sm);
@@ -507,8 +507,6 @@ figcaption .src { display: block; margin-top: .35rem; color: var(--ink-3); font-
   background: var(--paper-3); border-radius: 100px;
 }
 .doclist a:hover .meta { background: #fff; color: var(--accent); }
-.doclist .pending { color: var(--ink-3); }
-.doclist .pending .t { font-weight: 500; }
 
 /* ---------------------------------------------------------------- people */
 .people {

@@ -2,8 +2,8 @@
 <div class="wrap">
 <p class="eyebrow">Findings</p>
 <h1>Results</h1>
-<p class="tagline">Eight architectures against two shared baselines, on 32 South
-African weather stations, out to 48 hours &mdash; reported workstream by
+<p class="tagline">Six new architectures against two shared baselines, on 32
+South African weather stations, out to 48 hours &mdash; reported workstream by
 workstream.</p>
 
 <nav class="toc" aria-label="On this page">
@@ -37,8 +37,8 @@ cannot be attributed to the architecture.</p>
 </div>
 
 <div class="note">
-<p><strong>Where this matters in practice.</strong> The two workstreams reporting
-here agree closely on AGCRN &mdash; 2.197&nbsp;&deg;C and 2.194&nbsp;&deg;C
+<p><strong>Where this matters in practice.</strong> The continuous-time and
+diffusion workstreams agree closely on AGCRN &mdash; 2.197&nbsp;&deg;C and 2.194&nbsp;&deg;C
 average temperature MAE, computed independently. They differ on CLCRN
 (2.410 against 2.146&nbsp;&deg;C) because one CLCRN run out of the
 continuous-time workstream's ten temperature seeds failed to converge and was
@@ -51,7 +51,8 @@ is a reliability finding, not a discrepancy to be smoothed over.</p>
 <div class="table-scroll">
 <table class="t-text">
 <caption><b>Protocol by workstream.</b> Everything not listed here is shared
-&mdash; see the <a href="index.html#documents">shared experimental setup</a>.</caption>
+&mdash; see the <a href="index.html#documents">shared experimental setup</a>. An
+em dash marks a value the source does not state.</caption>
 <thead>
 <tr>
 <th scope="col">&nbsp;</th>
@@ -63,12 +64,12 @@ is a reliability finding, not a discrepancy to be smoothed over.</p>
 <tbody>
 <tr><th scope="row">Student</th><td>Praise Jaravani</td><td>Génevieve Chikwanha</td><td>Zoleka Fuyana</td></tr>
 <tr><th scope="row">Challengers</th><td>MTGODE, STGODE</td><td>DiffSTG, USTD</td><td>STLGRU, LiteSTGNN</td></tr>
-<tr><th scope="row">Random seeds</th><td>10 (42&ndash;51)</td><td>3 (2024, 2025, 2026)</td><td>Not available</td></tr>
-<tr><th scope="row">Input regime</th><td>all six variables in, one target out</td><td>univariate per variable</td><td>Not available</td></tr>
-<tr><th scope="row">Point metrics</th><td>MAE, RMSE, NRMSE</td><td>MAE, RMSE</td><td>Not available</td></tr>
+<tr><th scope="row">Random seeds</th><td>10 (42&ndash;51)</td><td>3 (2024, 2025, 2026)</td><td>&mdash;</td></tr>
+<tr><th scope="row">Input regime</th><td>all six variables in, one target out</td><td>univariate per variable</td><td>&mdash;</td></tr>
+<tr><th scope="row">Point metrics</th><td>MAE, RMSE, NRMSE</td><td>MAE, RMSE</td><td>&mdash;</td></tr>
 <tr><th scope="row">Additional metrics</th><td>valid forecast horizon; PR-AUC, F1, CSI for extreme-event detection</td><td>CRPS for probabilistic forecasts</td><td>parameter count, inference cost</td></tr>
 <tr><th scope="row">Extra analyses</th><td>extreme-stratified error, 2&times;2 factorial design, named heatwave case study, seed stability</td><td>exogenous-covariate ablation, spatial and elevation error patterns, learned adjacency maps</td><td>capacity&ndash;accuracy trade-off</td></tr>
-<tr><th scope="row">Hardware</th><td>NVIDIA L40S</td><td>NVIDIA A100</td><td>Not available</td></tr>
+<tr><th scope="row">Hardware</th><td>NVIDIA L40S</td><td>NVIDIA A100</td><td>&mdash;</td></tr>
 </tbody>
 </table>
 </div>
@@ -82,7 +83,8 @@ is a reliability finding, not a discrepancy to be smoothed over.</p>
 <div class="prose">
 <p>Four architectures, crossing the spatial prior (learned adaptive graph against
 geometric construction) with the temporal formulation (discrete recurrence
-against continuous-time neural ODE). Ten seeds per cell, 190 runs in total.</p>
+against continuous-time neural ODE). Ten seeds per cell; 190 runs across the
+campaign.</p>
 </div>
 
 <div class="table-scroll">
@@ -299,8 +301,8 @@ structure, and it conditions on time of day, day of year and station height.</p>
   alt="Four line charts of RMSE against forecast horizons of 3, 6, 9, 12, 24 and 48 hours for humidity, pressure, temperature and wind speed, comparing CLCRN, AGCRN, DiffSTG and USTD. All curves rise with horizon; DiffSTG is consistently highest.">
 <figcaption><b>RMSE across forecast horizons.</b> All models degrade as lead
 grows. DiffSTG produces the highest error at every horizon on every variable;
-USTD and AGCRN are closest at short lead, with CLCRN and AGCRN generally ahead
-between 6 and 24 hours. All four converge by 48 hours.
+USTD and AGCRN give the lowest errors at short lead, with CLCRN and AGCRN
+generally ahead between 6 and 24 hours. All four converge by 48 hours.
 <span class="src">Figure 3, Chikwanha (2026).</span></figcaption>
 </figure>
 
@@ -350,12 +352,6 @@ the observations.</p>
 <p class="eyebrow"><span class="tag light">Workstream 3</span></p>
 <h2>Lightweight: STLGRU and LiteSTGNN</h2>
 
-<div class="note">
-<p><strong>Reported from the poster only.</strong> No final paper was submitted
-for this workstream, so no full result tables or figures exist to post here. The
-summary below is everything publicly available for the lightweight workstream.</p>
-</div>
-
 <div class="prose">
 <p>The lightweight workstream asks what the parameter budget actually buys.
 Its headline result is that adding capacity to a small model gives sharply
@@ -366,10 +362,13 @@ variable is being forecast.</p>
 
 <p>This is the same pattern the continuous-time workstream found from the
 opposite direction, where the most accurate model of four was also among the
-cheapest, at 138,096 parameters against 1,663,104 for the weakest, and the
-smallest model of the four separated from the largest on every variable.
-Across both workstreams, model size and model accuracy are close to unrelated on
-this dataset.</p>
+cheapest, at 138,096 parameters against 1,663,104 for the weakest, and CLCRN,
+the smallest of the four, separated from the far larger STGODE on every
+variable. Across both workstreams, model size and model accuracy are close to
+unrelated on this dataset.</p>
+
+<p>These figures are summarised from the
+<a href="assets/docs/weatherflow-poster.pdf">project poster</a>.</p>
 </div>
 
 <p class="prose"><a href="lightweight.html">Full lightweight workstream &rarr;</a></p>
@@ -380,7 +379,7 @@ this dataset.</p>
 <div class="wrap">
 <h2>What holds across all three</h2>
 <div class="prose-wide">
-<p>Four patterns appear in every workstream that reported, despite the different
+<p>Four patterns appear across the workstreams, despite the different
 architectures, metrics and seed budgets.</p>
 
 <div class="finding">
@@ -414,8 +413,9 @@ the network is the likely common cause.</p>
 
 <div class="finding">
 <p class="eyebrow">4 &middot; Conditioning beats paradigm</p>
-<p>In both reporting workstreams, the within-family gap was larger than the
-family-versus-baseline gap, and in both cases the explanation was how the model
+<p>In both the continuous-time and diffusion workstreams, the within-family gap
+was larger than the family-versus-baseline gap, and in both cases the
+explanation was how the model
 is conditioned on space and context &mdash; a learned graph against a geometric
 one, a deterministic encoder with covariates against raw diffusion. Adopting a
 new paradigm is not what improves a forecast; conditioning it well is.</p>

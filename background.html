@@ -146,8 +146,8 @@ without processing each step sequentially.</p>
 <p>A further axis separates how the multi-step forecast is produced.
 <strong>Direct</strong> models emit all 48 steps in one shot.
 <strong>Autoregressive</strong> models decode one step at a time, feeding each
-prediction back as input &mdash; which avoids nothing at long lead, because
-errors accumulate. CLCRN decodes autoregressively while the other models tested
+prediction back as input, so errors compound as the horizon grows. CLCRN decodes
+autoregressively while the other models tested
 here are direct, an uncontrolled difference inherited from the original
 architectures that plausibly disadvantages CLCRN as the horizon grows.</p>
 </div>
@@ -176,14 +176,14 @@ removes the need for a predefined graph entirely: the adjacency is the normalise
 similarity of learnable node embeddings, trained end to end with the forecasting
 objective.</p>
 <p>Developed and evaluated on traffic benchmarks; transferred to South African
-weather data in 2023, where it was the best overall performer.</p>
+weather data by Gaibie et al., where it was the best overall performer.</p>
 </article>
 
 <article class="card">
 <p><span class="tag base">Baseline</span> <span class="tag">Geometric graph</span> <span class="tag">Discrete time</span></p>
 <h3>CLCRN</h3>
 <p class="who">Conditional Local Convolution Recurrent Network &mdash; Lin et al., 2022</p>
-<p>The only one of the eight models designed for meteorology. Its
+<p>Built for meteorology rather than adapted to it. Its
 <strong>conditional local convolution</strong> builds a <em>k</em>-nearest-neighbour
 neighbourhood around each station on the sphere and generates the kernel weights
 as a smooth learned function of each neighbour's local displacement &mdash;
@@ -192,7 +192,7 @@ location-aware, approximating a continuous kernel over the Earth's surface. The
 convolution sits inside a recurrent encoder&ndash;decoder that decodes the
 forecast autoregressively.</p>
 <p>Evaluated on WeatherBench reanalysis fields and transferred to SAWS stations
-in 2023. Its authors name training instability as an open problem of the method
+by Gaibie et al. Its authors name training instability as an open problem of the method
 &mdash; a caution this project saw borne out once in 190 runs.</p>
 </article>
 </div>
@@ -289,7 +289,7 @@ one in stations, models, or horizon.</caption>
 <td>10+ runs, walk-forward</td>
 </tr>
 <tr>
-<th scope="row">Gaibie et al., 2023</th>
+<th scope="row">Gaibie et al., 2024</th>
 <td>45</td>
 <td>AGCRN, CLCRN, Graph WaveNet, TCN</td>
 <td>24 h</td>
@@ -316,7 +316,7 @@ introduced the practice of analysing the dependency structures the trained model
 learn, and argued that a configuration should be judged partly on the deviation
 of its test loss across runs &mdash; a standard this project adopts.</p>
 
-<h3>Gaibie et al. (2023)</h3>
+<h3>Gaibie et al. (2024)</h3>
 <p>Extended the benchmark to AGCRN and CLCRN at 45 stations, predicting
 temperature, pressure, humidity and wind speed to 24 hours. Both newer models
 outperformed Graph WaveNet, with AGCRN achieving the best overall performance.
@@ -329,8 +329,8 @@ and its website is in the same departmental archive as this one.</p>
 lineage had not evaluated, raises the repeat count, and makes extreme weather an
 explicit prediction target rather than an unexamined part of the average.</p>
 
-<p class="note" style="display:block"><strong>External link.</strong> The 2023
-project website is archived at
+<p class="note" style="display:block"><strong>External link.</strong> That
+project's own website is archived at
 <a href="https://projects.cs.uct.ac.za/honsproj/">projects.cs.uct.ac.za/honsproj/</a>
 under 2023, "WEAHTER-FLOW". This is a non-permanent external link to the
 departmental archive and is not part of this website.</p>
