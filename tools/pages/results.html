@@ -66,7 +66,7 @@ em dash marks a value the source does not state.</caption>
 <tr><th scope="row">Challengers</th><td>MTGODE, STGODE</td><td>DiffSTG, USTD</td><td>STLGRU, LiteSTGNN</td></tr>
 <tr><th scope="row">Random seeds</th><td>10 (42&ndash;51)</td><td>3 (2024, 2025, 2026)</td><td>&mdash;</td></tr>
 <tr><th scope="row">Input regime</th><td>all six variables in, one target out</td><td>univariate per variable</td><td>&mdash;</td></tr>
-<tr><th scope="row">Point metrics</th><td>MAE, RMSE, NRMSE</td><td>MAE, RMSE</td><td>&mdash;</td></tr>
+<tr><th scope="row">Point metrics</th><td>MAE, RMSE, NRMSE</td><td>MAE, RMSE</td><td>MAE</td></tr>
 <tr><th scope="row">Additional metrics</th><td>valid forecast horizon; PR-AUC, F1, CSI for extreme-event detection</td><td>CRPS for probabilistic forecasts</td><td>parameter count, inference cost</td></tr>
 <tr><th scope="row">Extra analyses</th><td>extreme-stratified error, 2&times;2 factorial design, named heatwave case study, seed stability</td><td>exogenous-covariate ablation, spatial and elevation error patterns, learned adjacency maps</td><td>capacity&ndash;accuracy trade-off</td></tr>
 <tr><th scope="row">Hardware</th><td>NVIDIA L40S</td><td>NVIDIA A100</td><td>&mdash;</td></tr>
@@ -358,7 +358,11 @@ Its headline result is that adding capacity to a small model gives sharply
 diminishing returns: <strong>STLGRU is 4.1&times; the size of LiteSTGNN and
 improves MAE by only 0.7&ndash;5.7%</strong>. Performance was competitive with
 the baselines but variable-dependent &mdash; which family wins depends on which
-variable is being forecast.</p>
+variable is being forecast. On surface pressure both lightweight models sit
+clearly below AGCRN and CLCRN; on temperature and relative humidity the
+baselines lead; on wind speed the four are near-indistinguishable. The
+per-horizon curves are on the
+<a href="lightweight.html#findings">workstream page</a>.</p>
 
 <p>This is the same pattern the continuous-time workstream found from the
 opposite direction, where the most accurate model of four was also among the
@@ -367,8 +371,6 @@ the smallest of the four, separated from the far larger STGODE on every
 variable. Across both workstreams, model size and model accuracy are close to
 unrelated on this dataset.</p>
 
-<p>These figures are summarised from the
-<a href="assets/docs/weatherflow-poster.pdf">project poster</a>.</p>
 </div>
 
 <p class="prose"><a href="lightweight.html">Full lightweight workstream &rarr;</a></p>
@@ -423,7 +425,7 @@ new paradigm is not what improves a forecast; conditioning it well is.</p>
 
 <div class="next-prev">
 <span><a href="background.html">&larr; Background</a></span>
-<span><a href="resources.html">Resources &rarr;</a></span>
+<span><a href="continuous-time.html">Continuous-time workstream &rarr;</a></span>
 </div>
 </div>
 </div>

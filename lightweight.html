@@ -41,7 +41,7 @@ itself.</p>
 <ul class="pill-row" style="margin-top:1.6rem">
 <li><a class="pill" href="results.html#light">Results in context</a></li>
 <li><a class="pill" href="assets/docs/weatherflow-poster.pdf">Project poster (PDF)</a></li>
-<li><a class="pill" href="resources.html#code">Source code</a></li>
+<li><a class="pill" href="assets/code/weatherflow-source.zip">Source code (ZIP)</a></li>
 </ul>
 
 <nav class="toc" aria-label="On this page">
@@ -57,14 +57,6 @@ itself.</p>
 </nav>
 </div>
 </section>
-
-<div class="wrap" style="padding-top:1.5rem">
-<div class="note">
-<p><strong>Source.</strong> This page reports the lightweight workstream as it
-appears in the <a href="assets/docs/weatherflow-poster.pdf">project poster</a>,
-the joint deliverable covering all three workstreams.</p>
-</div>
-</div>
 
 <section id="question">
 <div class="wrap">
@@ -123,8 +115,8 @@ measurable.</p>
 <p>This workstream runs on the project's shared foundation: the same 32 South
 African Weather Service stations, the same hourly record from 2016 to 2025, the
 same chronological 60&nbsp;/&nbsp;20&nbsp;/&nbsp;20 split, the same inverse-distance
-imputation, the same four forecast targets, the same 48-hour horizon reported at
-3, 6, 9, 12, 24 and 48 hours, and the same two baselines. See the
+imputation, the same four forecast targets and the same two baselines. Error is
+reported at 6, 12, 24 and 48 hours. See the
 <a href="index.html#documents">shared experimental setup</a> for the full
 specification.</p>
 
@@ -157,6 +149,19 @@ ordering that holds across temperature, pressure, humidity and wind speed
 </div>
 
 </div>
+
+<figure>
+<img src="assets/img/figures/poster-lightweight.png" width="1459" height="1120"
+  alt="Four line charts of mean absolute error against forecast horizons of 6, 12, 24 and 48 hours, for temperature, surface pressure, relative humidity and wind speed, comparing LiteSTGNN, STLGRU, AGCRN and CLCRN. Error rises with horizon on every variable. The two lightweight models sit above the baselines on temperature and humidity, well below them on surface pressure, and within a hair of them on wind speed.">
+<figcaption><b>Error against forecast lead, lightweight models and baselines.</b>
+The variable-dependence is visible directly: the baselines lead on temperature
+and relative humidity, the two lightweight models lead on surface pressure by a
+clear margin, and on wind speed all four finish within about
+0.02&nbsp;m&nbsp;s<sup>&minus;1</sup> of one another. STLGRU sits below
+LiteSTGNN on three of the four variables &mdash; the narrow gap that
+4.1&times; the parameters buys.
+<span class="src">Project poster, lightweight panel.</span></figcaption>
+</figure>
 </div>
 </section>
 
@@ -195,10 +200,14 @@ considerably more than how large it is.</p>
   <span class="t">Project poster</span>
   <span class="d">Joint deliverable covering all three workstreams, including the lightweight results summarised above.</span>
   <span class="meta">PDF</span></a></li>
-<li><a href="resources.html#code">
-  <span class="t">Source code</span>
-  <span class="d">Model implementations, preprocessing and evaluation scripts.</span>
-  <span class="meta">Archive</span></a></li>
+<li><a href="assets/code/weatherflow-source.zip">
+  <span class="t">WeatherFLOW source code</span>
+  <span class="d">The whole framework, with this workstream's STLGRU and LiteSTGNN integrations under models/lightweight/ and the shared baselines under models/baselines/.</span>
+  <span class="meta">ZIP</span></a></li>
+<li><a href="assets/docs/project-proposal.pdf">
+  <span class="t">Project proposal</span>
+  <span class="d">Joint proposal by Chikwanha, Fuyana and Jaravani, setting out how the study would be conducted.</span>
+  <span class="meta">PDF &middot; 10 pp</span></a></li>
 </ul>
 
 <div class="next-prev">

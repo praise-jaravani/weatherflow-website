@@ -67,6 +67,22 @@ Service stations, out to <strong>48 hours</strong> &mdash; double the horizon of
 the prior work. All three families run through one shared pipeline, so the data,
 the chronological split, the loss, and the evaluation are held constant and the
 architecture is what varies.</p>
+
+<h3>Objectives</h3>
+<ol>
+<li><strong>Compare three newer STGNN families against the established
+baselines.</strong> Continuous-time, diffusion-based and lightweight
+architectures, each measured against AGCRN and CLCRN on the same data.</li>
+<li><strong>Test whether forecasts hold up as lead time doubles.</strong> The
+prior work on this data stopped at 24 hours; every model here is evaluated out
+to 48.</li>
+<li><strong>Test whether they hold up during extreme weather.</strong> Error on
+the hours that exceed a station's 95th percentile, measured separately from the
+average, because warning decisions rest on exactly those hours.</li>
+<li><strong>Measure what the accuracy costs.</strong> Parameter count and
+inference time reported alongside error, so capacity and accuracy can be read
+against one another.</li>
+</ol>
 </div>
 
 <div class="grid three" style="margin-top:2rem">

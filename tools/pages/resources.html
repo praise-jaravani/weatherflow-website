@@ -87,12 +87,31 @@ experiment runs the code the original authors released, over identical
 preprocessed tensors, splits, loss, optimiser, seeds and evaluation suite.</p>
 </div>
 
+<p class="prose">One archive holds the whole project &mdash; the shared framework
+and all three workstreams. Each workstream's models sit in their own directory
+within it:</p>
+
 <ul class="doclist">
 <li><a href="assets/code/weatherflow-source.zip">
-  <span class="t">WeatherFLOW framework</span>
+  <span class="t">WeatherFLOW source code</span>
   <span class="d">Preprocessing, model adapters, training harness, evaluation suite, experiment configuration and analysis scripts.</span>
   <span class="meta">ZIP</span></a></li>
 </ul>
+
+<div class="table-scroll">
+<table class="t-text">
+<caption><b>Where each workstream's code lives in the archive.</b></caption>
+<thead>
+<tr><th scope="col">Workstream</th><th scope="col">Models</th><th scope="col">Directory</th></tr>
+</thead>
+<tbody>
+<tr><th scope="row">Shared baselines</th><td>AGCRN, CLCRN</td><td>models/baselines/</td></tr>
+<tr><th scope="row"><a href="continuous-time.html">Continuous-time</a></th><td>MTGODE, STGODE</td><td>models/continuous_time/</td></tr>
+<tr><th scope="row"><a href="diffusion.html">Diffusion-based</a></th><td>DiffSTG, USTD</td><td>genevieve/Diffusion_Based_STGNNs/</td></tr>
+<tr><th scope="row"><a href="lightweight.html">Lightweight</a></th><td>STLGRU, LiteSTGNN</td><td>models/lightweight/</td></tr>
+</tbody>
+</table>
+</div>
 
 <div class="note">
 <p><strong>What the archive excludes.</strong> Raw and preprocessed station data,
@@ -113,7 +132,7 @@ not guaranteed to remain available indefinitely.</p>
 <ul class="doclist">
 <li><a href="https://github.com/praise-jaravani/WeatherFLOW">
   <span class="t">WeatherFLOW</span>
-  <span class="d">The shared framework and the continuous-time workstream (AGCRN, CLCRN, MTGODE, STGODE).</span>
+  <span class="d">The shared framework, the baselines, and the continuous-time and lightweight workstreams.</span>
   <span class="meta">GitHub &#8599;</span></a></li>
 <li><a href="https://github.com/GenevieveAkosua/Diffusion_Based_STGNNs">
   <span class="t">Diffusion_Based_STGNNs</span>
