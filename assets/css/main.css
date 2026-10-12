@@ -368,8 +368,11 @@ section + section { border-top: 1px solid var(--rule); }
 
 /* ---------------------------------------------------------------- cards -- */
 .grid { display: grid; gap: 1.35rem; }
-.grid.two   { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-.grid.three { grid-template-columns: repeat(auto-fit, minmax(265px, 1fr)); }
+/* min() caps the track minimum at the container width, so on a viewport
+   narrower than the minimum (a 320px phone) the column collapses to fit
+   instead of forcing the whole page to scroll sideways. */
+.grid.two   { grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); }
+.grid.three { grid-template-columns: repeat(auto-fit, minmax(min(265px, 100%), 1fr)); }
 
 .card {
   position: relative; background: var(--paper);
